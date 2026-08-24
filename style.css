@@ -1,21 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-    --bg-main: #F8FAFC;       /* Putih Bersih Kebiruan */
-    --bg-card: #FFFFFF;       /* Putih Murni */
-    --text-main: #1E293B;     /* Slate Gelap */
-    --text-muted: #64748B;    /* Slate Lembut */
-    --btn-blue: #3B82F6;      /* Biru Utama */
-    --btn-skip: #E2E8F0;      /* Abu-abu Garis */
+    --bg-main: #F8FAFC; 
+    --bg-card: #FFFFFF; 
+    --text-main: #1E293B; 
+    --text-muted: #64748B; 
+    --btn-blue: #3B82F6; 
+    --btn-skip: #E2E8F0; 
     --nav-bg: #FFFFFF;
     
-    /* Palet Warna Senada (Tailwind 600 Series) */
-    --color-kuliah: #2563EB;  /* Biru Royal */
-    --color-tugas: #7C3AED;   /* Ungu Elegan */
-    --color-acara: #059669;   /* Emerald Segar */
-    --color-rutin: #D97706;   /* Amber Hangat */
-    --color-salat: #475569;   /* Slate Netral */
-    --color-minggu: #DC2626;  /* Merah Libur */
+    --color-kuliah: #2563EB; 
+    --color-tugas: #7C3AED; 
+    --color-acara: #059669; 
+    --color-rutin: #D97706; 
+    --color-salat: #475569; 
+    --color-minggu: #DC2626; 
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -27,13 +26,12 @@ header h1 { font-size: 28px; font-weight: 800; margin-bottom: 5px; color: #0F172
 header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 
 .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
-
 .svg-icon { vertical-align: text-bottom; width: 14px; height: 14px; margin-right: 4px; stroke: currentColor; }
 
 /* FAB & Navigasi */
 .fab-container { position: fixed; bottom: 90px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; z-index: 10; }
 .fab-menu { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; align-items: flex-end; }
-.fab-menu button { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--btn-skip); padding: 10px 16px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 14px; font-weight: 600; }
+.fab-menu button { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--btn-skip); padding: 10px 16px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 14px; font-weight: 600; cursor: pointer; }
 .fab { background-color: var(--text-main); color: #FFF; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; transition: 0.2s; }
 .fab:active { transform: scale(0.95); }
 
@@ -54,10 +52,11 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .event-pill-container { width: 100%; height: 6px; padding: 0 4px; margin-top: auto; margin-bottom: 2px; }
 .event-pill { width: 100%; height: 100%; border-radius: 4px; }
 
-/* KARTU JADWAL (Header Berwarna) */
-.card { background-color: var(--bg-card); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.03); border: 1px solid var(--btn-skip); }
+/* KARTU JADWAL (Shadow Dinaikkan) */
+.card { background-color: var(--bg-card); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.08); border: 1px solid var(--btn-skip); }
+.card:active { transform: scale(0.98); }
 .card-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; color: white; }
-.card-header h3 { font-size: 15px; margin: 0; font-weight: 700; }
+.card-header h3 { font-size: 15px; margin: 0; font-weight: 700; transition: 0.2s; }
 .card-header .time-badge { font-size: 12px; font-weight: 600; opacity: 0.9; }
 
 .check-btn { background: none; border: none; color: white; cursor: pointer; opacity: 0.8; transition: 0.2s; display: flex; align-items: center; }
@@ -79,18 +78,18 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .history-tabs { display: flex; gap: 10px; margin-bottom: 15px; margin-top: 10px; }
 .tab-btn { flex: 1; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--btn-skip); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 .tab-btn.active { background: var(--text-main); color: white; border-color: var(--text-main); }
-.history-card { opacity: 0.8; }
-.history-card .card-detail { color: var(--text-muted); text-decoration: line-through; }
 
-/* Modal */
+/* Modal & Input */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 20; backdrop-filter: blur(2px); }
 .modal { background-color: var(--bg-card); padding: 24px; border-radius: 16px; width: 90%; max-width: 360px; max-height: 85vh; overflow-y: auto; }
 .modal h2 { color: var(--text-main); font-weight: 800; margin-bottom: 10px; }
 .modal label { font-size: 12px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; margin-top: 12px; }
 .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--btn-skip); background-color: var(--bg-main); color: var(--text-main); font-weight: 500; }
-.modal input[type="color"] { height: 40px; padding: 2px; }
 .modal-btns { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
 .modal-btns button { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
 .btn-save { background-color: var(--text-main); color: white; }
 .btn-cancel { background-color: var(--btn-skip); color: var(--text-main); }
-.checkbox-group label { background: var(--bg-main); padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; border: 1px solid var(--btn-skip); }
+
+/* Checkbox Rutinitas (Grid 3 Kolom) */
+.checkbox-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; margin-bottom: 15px; }
+.checkbox-group label { background: var(--bg-main); padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border: 1px solid var(--btn-skip); }
