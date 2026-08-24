@@ -8,12 +8,13 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header dengan tombol geser bulan -->
         <div class="calendar-header">
             <button onclick="changeMonth(-1)">&#10094;</button>
-            <div>
+            <div style="position: relative; cursor: pointer;">
                 <h1 style="font-size: 24px; text-align: center; margin-bottom:0;">Kalender.</h1>
-                <p id="month-display" style="text-align: center; color: var(--text-muted); font-size: 12px;"></p>
+                <p id="month-display-text" style="text-align: center; color: var(--text-muted); font-size: 14px; font-weight: bold;"></p>
+                <!-- Native Picker HP -->
+                <input type="month" id="native-month-picker" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0;">
             </div>
             <button onclick="changeMonth(1)">&#10095;</button>
         </div>
@@ -22,49 +23,54 @@
 
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
-                <button onclick="openModal('Tugas')">Tugas Kuliah</button>
-                <button onclick="openModal('Acara')">Acara Bebas</button>
+                <button onclick="openModal('Tugas Kuliah')">Tugas Kuliah</button>
+                <button onclick="openModal('Tugas')">Tugas Biasa</button>
             </div>
             <div class="fab" onclick="toggleFabMenu()">+</div>
         </div>
     </div>
 
-    <!-- Modal Detail Hari (Saat tanggal diklik) -->
+    <!-- Modal Day Details -->
     <div class="modal-overlay" id="day-detail-modal">
         <div class="modal">
             <h2 id="detail-date-title" style="font-size: 16px; margin-bottom: 15px;">Jadwal</h2>
             <div id="detail-list" style="margin-bottom: 20px;"></div>
-            <div style="text-align: right;">
-                <button onclick="closeModal('day-detail-modal')" class="btn-save">Tutup</button>
-            </div>
+            <div style="text-align: right;"><button onclick="closeModal('day-detail-modal')" class="btn-save">Tutup</button></div>
         </div>
     </div>
 
-    <!-- Modal Tambah Sama Seperti Index -->
+    <!-- Panggil File Form yang sama persis seperti di index.html untuk Modal (Copy Paste dari index.html bagian insert-modal) -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
-            <h2 id="modal-title">Tambah Jadwal</h2>
-            <input type="text" id="new-task-name" placeholder="Nama Kegiatan...">
-            <input type="date" id="new-task-date">
-            <input type="time" id="new-task-time">
-            <div id="color-picker-container" style="display: none;">
-                <label style="font-size: 12px; color: var(--text-muted);">Pilih Warna Acara:</label>
-                <input type="color" id="new-task-color" value="#A3D9A5">
-            </div>
-            <div class="modal-btns" style="text-align: right;">
-                <button onclick="closeModal('insert-modal')" style="background:var(--bg-main); color:white;">Batal</button>
+            <h2 id="modal-title">Tambah</h2>
+            <form id="insert-form">
+                <input type="hidden" id="current-category">
+                <label>Nama / Judul *</label>
+                <input type="text" id="new-task-name" placeholder="Msl: Makalah Kelompok">
+                <div id="field-matkul-dropdown" style="display:none;">
+                    <label>Mata Kuliah</label>
+                    <select id="task-matkul-select"></select>
+                    <label>Pengumpulan</label>
+                    <input type="text" id="task-via" placeholder="Msl: G-Drive / E-Learning">
+                </div>
+                <label>Tgl Deadline *</label><input type="date" id="new-task-date">
+                <label>Jam Deadline *</label><input type="time" id="new-task-time">
+                <label>Deskripsi</label><textarea id="new-task-desc" rows="2"></textarea>
+                <div id="field-warna" style="display: none;"><label>Warna</label><input type="color" id="new-task-color"></div>
+            </form>
+            <div class="modal-btns">
+                <button onclick="closeModal('insert-modal')" style="background:var(--bg-card); color:white;">Batal</button>
                 <button class="btn-save" onclick="saveNewTask()">Simpan</button>
             </div>
         </div>
     </div>
 
-    <!-- Navigasi Bawah -->
+    <!-- Navigasi -->
     <nav class="bottom-nav">
         <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
         <a href="kalender.html" class="nav-item active"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></a>
         <a href="matkul.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></a>
     </nav>
-
     <script src="script.js"></script>
 </body>
 </html>
