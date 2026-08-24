@@ -13,13 +13,22 @@
             <div style="position: relative; cursor: pointer;">
                 <h1 style="font-size: 24px; text-align: center; margin-bottom:0;">Kalender.</h1>
                 <p id="month-display-text" style="text-align: center; color: var(--text-muted); font-size: 14px; font-weight: bold;"></p>
-                <!-- Native Picker HP -->
                 <input type="month" id="native-month-picker" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0;">
             </div>
             <button onclick="changeMonth(1)">&#10095;</button>
         </div>
 
         <div class="calendar-grid" id="calendar-grid"></div>
+
+        <!-- Kolom Riwayat Tugas -->
+        <div class="history-container">
+            <h2 style="font-size: 16px;">Riwayat Selesai</h2>
+            <div class="history-tabs">
+                <button class="tab-btn active" id="tab-tk" onclick="renderHistory('Tugas Kuliah')">Tugas Kuliah</button>
+                <button class="tab-btn" id="tab-tb" onclick="renderHistory('Tugas')">Tugas Biasa</button>
+            </div>
+            <div id="history-list"></div>
+        </div>
 
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
@@ -34,12 +43,37 @@
     <div class="modal-overlay" id="day-detail-modal">
         <div class="modal">
             <h2 id="detail-date-title" style="font-size: 16px; margin-bottom: 15px;">Jadwal</h2>
-            <div id="detail-list" style="margin-bottom: 20px;"></div>
+            <div id="detail-list" style="margin-bottom: 20px; max-height: 50vh; overflow-y: auto;"></div>
             <div style="text-align: right;"><button onclick="closeModal('day-detail-modal')" class="btn-save">Tutup</button></div>
         </div>
     </div>
 
-    <!-- Panggil File Form yang sama persis seperti di index.html untuk Modal (Copy Paste dari index.html bagian insert-modal) -->
+    <!-- Modal Edit/Reschedule Matkul Khusus Hari Itu -->
+    <div class="modal-overlay" id="reschedule-modal">
+        <div class="modal">
+            <h2 style="font-size: 16px;">Ubah Jadwal Matkul Ini</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">(Hanya mengubah jadwal hari ini, minggu depan tetap normal)</p>
+            
+            <input type="hidden" id="res-matkulId">
+            <input type="hidden" id="res-originalDate">
+            
+            <label>Pindah ke Tanggal</label>
+            <input type="date" id="res-date">
+            <label>Ubah Jam</label>
+            <input type="time" id="res-time">
+            <label>Ubah Ruangan / Via</label>
+            <input type="text" id="res-ruang" placeholder="Msl: Zoom / Ruang 2">
+            <label>Dosen Pengganti (Jika ada)</label>
+            <input type="text" id="res-dosen">
+
+            <div class="modal-btns">
+                <button onclick="closeModal('reschedule-modal')" style="background:var(--bg-card); color:white;">Batal</button>
+                <button class="btn-save" onclick="saveReschedule()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Tugas (Dari Index) -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
             <h2 id="modal-title">Tambah</h2>
