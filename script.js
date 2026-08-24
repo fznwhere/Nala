@@ -8,82 +8,87 @@ const iRom = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 21h18"></pat
 const iDat = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
 const iPls = `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
 const iCir = `<svg class="svg-icon" style="width:20px;height:20px;margin:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg>`;
+const iChkCir = `<svg class="svg-icon" style="width:20px;height:20px;margin:0;" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+const iRe = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>`;
 
 function toggleFabMenu() { const menu = document.getElementById('fab-menu'); if(menu) menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; editId = null; }
 function toggleDetail(element) { const detail = element.querySelector('.card-detail'); if(detail) detail.classList.toggle('show'); }
 
-// --- LOGIKA DISMISS JADWAL ---
-function dismissItem(type, id, dateStr) {
-    if(type === 'tugas' || type === 'acara') { markTaskDone(id); return; }
-    let dismissed = JSON.parse(localStorage.getItem('nalaDismissed')) || [];
-    dismissed.push(`${type}_${id}_${dateStr}`);
-    localStorage.setItem('nalaDismissed', JSON.stringify(dismissed));
-    loadTodaySchedule();
+// --- LOGIKA UNDO/TOGGLE SELESAI ---
+function toggleTaskDone(id) {
+    let tasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let idx = tasks.findIndex(t => t.id === id);
+    if(idx !== -1) { 
+        tasks[idx].status = tasks[idx].status === 'done' ? 'pending' : 'done'; 
+        localStorage.setItem('nalaTasks', JSON.stringify(tasks)); 
+        refreshAllViews();
+    }
 }
-function isDismissed(type, id, dateStr) {
-    return (JSON.parse(localStorage.getItem('nalaDismissed')) || []).includes(`${type}_${id}_${dateStr}`);
+function toggleDismiss(type, id, dateStr) {
+    if(type === 'tugas' || type === 'acara') { toggleTaskDone(id); return; }
+    let dismissed = JSON.parse(localStorage.getItem('nalaDismissed')) || []; const key = `${type}_${id}_${dateStr}`;
+    if(dismissed.includes(key)) dismissed = dismissed.filter(k => k !== key); else dismissed.push(key);
+    localStorage.setItem('nalaDismissed', JSON.stringify(dismissed)); refreshAllViews();
+}
+function isDismissed(type, id, dateStr) { return (JSON.parse(localStorage.getItem('nalaDismissed')) || []).includes(`${type}_${id}_${dateStr}`); }
+function refreshAllViews() {
+    if(document.getElementById('schedule-list')) loadTodaySchedule();
+    if(document.getElementById('calendar-grid')) { renderMonthCalendar(); renderUpcomingTasks(); renderHistory(currentHistoryTab); }
 }
 
 // --- BERANDA ---
-if(document.getElementById('schedule-list')) { loadTodaySchedule(); renderUpcomingTasks(); renderHistory('Tugas Kuliah'); }
+if(document.getElementById('schedule-list')) loadTodaySchedule();
 
 async function loadTodaySchedule() {
     const list = document.getElementById('schedule-list'); const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const todayDayName = namaHari[today.getDay()];
-    let combinedSchedule = [];
+    const todayDayName = namaHari[today.getDay()]; let combinedSchedule = [];
+    
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
 
-    // Kuliah (Libur jika Minggu, kecuali Override)
     let todaysMatkul = savedMatkul.filter(m => m.hari === todayDayName);
-    if(todayDayName === 'Minggu') todaysMatkul = []; // Minggu Merah
+    if(todayDayName === 'Minggu') todaysMatkul = [];
     todaysMatkul = todaysMatkul.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === todayStr));
     let movedIn = overrides.filter(o => o.newDate === todayStr).map(o => { let orig = savedMatkul.find(m => m.id === o.matkulId); return orig ? { ...orig, ...o, isOverride: true } : null; }).filter(x => x);
-    
     [...todaysMatkul, ...movedIn].forEach(m => {
-        if(!isDismissed('kuliah', m.id, todayStr)) {
-            combinedSchedule.push({ type: 'kuliah', id: m.id, name: `Kuliah: ${m.name}`, time: m.isOverride ? m.newTime : m.jamMulai, endTime: m.jamSelesai || '', color: 'var(--color-kuliah)', ruang: m.isOverride ? m.newRuangan : m.ruangan, dosen: m.isOverride ? m.newDosen : m.dosen });
-        }
+        combinedSchedule.push({ type: 'kuliah', id: m.id, name: `Kuliah: ${m.name}`, time: m.isOverride ? m.newTime : m.jamMulai, endTime: m.jamSelesai || '', color: 'var(--color-kuliah)', ruang: m.isOverride ? m.newRuangan : m.ruangan, dosen: m.isOverride ? m.newDosen : m.dosen });
     });
 
-    // Tugas, Acara, Rutinitas
-    savedTasks.filter(t => t.date === todayStr && t.status !== 'done').forEach(t => {
-        combinedSchedule.push({ type: t.category.toLowerCase().includes('tugas') ? 'tugas' : 'acara', id: t.id, name: t.name, time: t.time, endTime: '', color: t.color || 'var(--color-acara)', desc: t.deskripsi || 'Tidak ada catatan.', via: t.pengumpulan, cat: t.category });
+    savedTasks.filter(t => t.date === todayStr).forEach(t => {
+        combinedSchedule.push({ type: t.category.toLowerCase().includes('tugas') ? 'tugas' : 'acara', id: t.id, name: t.name, time: t.time, endTime: '', color: t.color || 'var(--color-acara)', desc: t.deskripsi || 'Tidak ada catatan.', via: t.pengumpulan, cat: t.category, status: t.status });
     });
     savedRoutines.filter(r => r.days.includes(todayDayName)).forEach(r => {
-        if(!isDismissed('rutin', r.id, todayStr)) combinedSchedule.push({ type: 'rutin', id: r.id, name: r.name, time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: 'Jadwal Rutinitas Mingguan' });
+        combinedSchedule.push({ type: 'rutin', id: r.id, name: r.name, time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: 'Jadwal Rutinitas Mingguan' });
     });
 
-    // Salat
     const salatNames = ['Subuh', 'Zuhur', 'Asar', 'Maghrib', 'Isya'];
     try {
         const t = (await (await fetch('https://api.aladhan.com/v1/timingsByCity?city=Yogyakarta&country=Indonesia&method=11')).json()).data.timings;
-        ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((w, i) => { 
-            if(!isDismissed('salat', salatNames[i], todayStr)) combinedSchedule.push({ type: 'salat', id: salatNames[i], name: salatNames[i], time: t[w], endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat' }); 
-        });
+        ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((w, i) => { combinedSchedule.push({ type: 'salat', id: salatNames[i], name: salatNames[i], time: t[w], endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat' }); });
     } catch (e) {
-        ['04:30', '11:45', '15:00', '17:45', '19:00'].forEach((w, i) => { 
-            if(!isDismissed('salat', salatNames[i], todayStr)) combinedSchedule.push({ type: 'salat', id: salatNames[i], name: `${salatNames[i]} (Offline)`, time: w, endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat (Offline)' }); 
-        });
+        ['04:30', '11:45', '15:00', '17:45', '19:00'].forEach((w, i) => { combinedSchedule.push({ type: 'salat', id: salatNames[i], name: `${salatNames[i]} (Offline)`, time: w, endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat (Offline)' }); });
     }
 
     combinedSchedule.sort((a, b) => a.time.localeCompare(b.time));
-    list.innerHTML = combinedSchedule.length ? '' : '<p style="text-align:center; color:var(--text-muted);">Semua jadwal hari ini sudah beres! 🔥</p>';
+    list.innerHTML = combinedSchedule.length ? '' : '<p style="text-align:center; color:var(--text-muted);">Jadwal kosong.</p>';
     
     combinedSchedule.forEach(item => {
+        let completed = (item.type === 'tugas' || item.type === 'acara') ? (item.status === 'done') : isDismissed(item.type, item.id, todayStr);
+        let titleStyle = completed ? 'text-decoration: line-through; color: #CBD5E1;' : '';
+        let btnIcon = completed ? iChkCir : iCir; let cardOpacity = completed ? 'opacity: 0.65;' : '';
+
         let detailHtml = '';
         if(item.type === 'kuliah') { detailHtml = `<div class="detail-grid"><div class="detail-item">${iRom} <div><span>Ruangan</span>${item.ruang}</div></div><div class="detail-item">${iUsr} <div><span>Dosen</span>${item.dosen}</div></div></div>`; } 
-        else if(item.type === 'tugas' || item.type === 'acara') { detailHtml = `<p style="line-height:1.5;">${item.desc}</p> ${item.via ? `<div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--btn-skip);"><span>Via/Kumpul:</span> <strong>${item.via}</strong></div>` : ''} <div class="card-actions"><button class="icon-btn edit" onclick="event.stopPropagation(); openEditTask(${item.id}, '${item.cat}')">${iEdt} Edit</button></div>`; } 
+        else if(item.type === 'tugas' || item.type === 'acara') { detailHtml = `<p style="line-height:1.5;">${item.desc}</p> ${item.via ? `<div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--btn-skip);"><span>Via/Kumpul:</span> <strong>${item.via}</strong></div>` : ''} <div class="card-actions"><button class="icon-btn" onclick="event.stopPropagation(); openEditTask(${item.id}, '${item.cat}')">${iEdt} Edit</button></div>`; } 
         else { detailHtml = `<p>${item.desc}</p>`; }
 
         list.innerHTML += `
-            <div class="card" onclick="toggleDetail(this)">
+            <div class="card" onclick="toggleDetail(this)" style="${cardOpacity}">
                 <div class="card-header" style="background-color: ${item.color};">
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <button class="check-btn" onclick="event.stopPropagation(); dismissItem('${item.type}', '${item.id}', '${todayStr}')">${iCir}</button>
-                        <h3 style="font-size:15px;">${item.name}</h3>
+                        <button class="check-btn" onclick="event.stopPropagation(); toggleDismiss('${item.type}', '${item.id}', '${todayStr}')">${btnIcon}</button>
+                        <h3 style="font-size:15px; ${titleStyle}">${item.name}</h3>
                     </div>
                     <span class="time-badge">${iClk} ${item.time} ${item.endTime ? '- '+item.endTime : ''}</span>
                 </div>
@@ -92,7 +97,16 @@ async function loadTodaySchedule() {
     });
 }
 
-// --- TUGAS MENDATANG & RIWAYAT (DI BERANDA) ---
+// --- KALENDER (TUGAS MENDATANG & RIWAYAT) ---
+if(document.getElementById('calendar-grid')) {
+    renderMonthCalendar(); renderHistory('Tugas Kuliah'); renderUpcomingTasks();
+    if(document.getElementById('native-month-picker')) {
+        document.getElementById('native-month-picker').addEventListener('change', function(e) {
+            if(e.target.value) { const p = e.target.value.split('-'); currentNavDate.setFullYear(parseInt(p[0]), parseInt(p[1]) - 1); renderMonthCalendar(); }
+        });
+    }
+}
+
 function renderUpcomingTasks() {
     const list = document.getElementById('upcoming-list'); if(!list) return; list.innerHTML = '';
     let pendingTasks = (JSON.parse(localStorage.getItem('nalaTasks')) || []).filter(t => t.status !== 'done' && (t.category === 'Tugas Kuliah' || t.category === 'Tugas'));
@@ -109,7 +123,7 @@ function renderUpcomingTasks() {
             <div class="card" onclick="toggleDetail(this)">
                 <div class="card-header" style="background-color: ${t.color || 'var(--color-tugas)'};">
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <button class="check-btn" onclick="event.stopPropagation(); markTaskDone(${t.id})">${iCir}</button>
+                        <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone(${t.id})">${iCir}</button>
                         <div><h3 style="margin-bottom: 2px;">${t.name}</h3><small style="opacity:0.9;">${iDat} ${t.date} &nbsp; ${iClk} ${t.time}</small></div>
                     </div>
                     <span class="${badgeClass}">${badgeText}</span>
@@ -134,22 +148,15 @@ function renderHistory(tabName) {
     doneTasks.sort((a,b) => b.date.localeCompare(a.date)).forEach(t => { 
         list.innerHTML += `
             <div class="card history-card" onclick="toggleDetail(this)">
-                <div class="card-header" style="background-color: ${t.color || 'var(--color-tugas)'}; opacity:0.6;">
-                    <div><h3 style="text-decoration:line-through;">${t.name}</h3><small>${iDat} ${t.date}</small></div>
+                <div class="card-header" style="background-color: ${t.color || 'var(--color-tugas)'}; opacity:0.8;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone(${t.id})">${iChkCir}</button>
+                        <div><h3 style="text-decoration:line-through; color: #CBD5E1;">${t.name}</h3><small style="opacity:0.9;">${iDat} ${t.date}</small></div>
+                    </div>
                 </div>
-                <div class="card-detail"><p style="text-decoration:line-through;">${t.deskripsi || t.category} ${t.pengumpulan ? `<br>Via: ${t.pengumpulan}` : ''}</p></div>
+                <div class="card-detail"><p style="color:var(--text-muted); line-height:1.5;">${t.deskripsi || t.category} ${t.pengumpulan ? `<br>Via: ${t.pengumpulan}` : ''}</p></div>
             </div>`; 
     });
-}
-
-// --- KALENDER ---
-if(document.getElementById('calendar-grid')) {
-    renderMonthCalendar();
-    if(document.getElementById('native-month-picker')) {
-        document.getElementById('native-month-picker').addEventListener('change', function(e) {
-            if(e.target.value) { const p = e.target.value.split('-'); currentNavDate.setFullYear(parseInt(p[0]), parseInt(p[1]) - 1); renderMonthCalendar(); }
-        });
-    }
 }
 
 function changeMonth(offset) { currentNavDate.setMonth(currentNavDate.getMonth() + offset); renderMonthCalendar(); }
@@ -166,20 +173,14 @@ function renderMonthCalendar() {
     
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
     
-    // Bulan Lalu (Dimmed)
     for(let i = firstDay - 1; i >= 0; i--) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(-1)"><span class="day-number">${prevDays - i}</span></div>`; }
-    
-    // Bulan Ini
     for(let i = 1; i <= daysInMonth; i++) {
         let currentLoopDate = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`; let loopDayName = namaHari[new Date(year, month, i).getDay()];
         let dayColors = []; let isSunday = loopDayName === 'Minggu';
-        
-        let matkulsToday = savedMatkul.filter(m => m.hari === loopDayName);
-        if(isSunday) matkulsToday = []; // Blokir hari minggu
+        let matkulsToday = savedMatkul.filter(m => m.hari === loopDayName); if(isSunday) matkulsToday = [];
         matkulsToday = matkulsToday.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === currentLoopDate));
         let movedIn = overrides.filter(o => o.newDate === currentLoopDate);
         if(matkulsToday.length > 0 || movedIn.length > 0) dayColors.push('var(--color-kuliah)');
-        
         savedTasks.filter(t => t.date === currentLoopDate && t.status !== 'done').forEach(t => dayColors.push(t.color || 'var(--color-tugas)'));
         
         let uColors = [...new Set(dayColors)]; let pillStyle = '';
@@ -193,8 +194,6 @@ function renderMonthCalendar() {
         let numClass = isSunday ? 'day-number sunday-red' : 'day-number';
         grid.innerHTML += `<div class="day-cell" onclick="showDayDetails('${currentLoopDate}', '${loopDayName}')"><span class="${numClass}">${i}</span>${pillHtml}</div>`;
     }
-    
-    // Bulan Depan (Dimmed)
     const totalCells = firstDay + daysInMonth; const nextDays = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
     for(let i = 1; i <= nextDays; i++) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(1)"><span class="day-number">${i}</span></div>`; }
 }
@@ -238,11 +237,6 @@ function saveReschedule() {
     let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || []; overrides = overrides.filter(o => !(o.matkulId === mId && o.originalDate === origDate));
     overrides.push({ matkulId: mId, originalDate: origDate, newDate: document.getElementById('res-date').value, newTime: document.getElementById('res-time').value, newRuangan: document.getElementById('res-ruang').value, newDosen: document.getElementById('res-dosen').value });
     localStorage.setItem('nalaOverrides', JSON.stringify(overrides)); closeModal('reschedule-modal'); renderMonthCalendar();
-}
-
-function markTaskDone(id) {
-    let tasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let idx = tasks.findIndex(t => t.id === id);
-    if(idx !== -1) { tasks[idx].status = 'done'; localStorage.setItem('nalaTasks', JSON.stringify(tasks)); if(document.getElementById('schedule-list')) { loadTodaySchedule(); renderUpcomingTasks(); renderHistory(currentHistoryTab); } }
 }
 
 // --- MODAL TAMBAH TUGAS/ACARA/RUTIN ---
@@ -290,9 +284,7 @@ function saveNewTask() {
         if(editId) { const idx = savedTasks.findIndex(t => t.id === editId); if(idx !== -1) savedTasks[idx] = taskData; } else { savedTasks.push(taskData); }
         localStorage.setItem('nalaTasks', JSON.stringify(savedTasks));
     }
-    closeModal('insert-modal');
-    if(document.getElementById('schedule-list')) { loadTodaySchedule(); renderUpcomingTasks(); renderHistory(currentHistoryTab); }
-    if(document.getElementById('calendar-grid')) renderMonthCalendar();
+    closeModal('insert-modal'); refreshAllViews();
 }
 
 // --- KULIAH PAGE ---
@@ -323,7 +315,7 @@ function renderMatkulList() {
                         <div class="detail-item">${iRom} <div><span>Ruangan</span>${m.ruangan}</div></div>
                         <div class="detail-item" style="grid-column: span 2;">${iUsr} <div><span>Dosen Pengampu</span>${m.dosen}</div></div>
                     </div>
-                    <div class="card-actions"><button class="icon-btn edit" onclick="event.stopPropagation(); editMatkul(${m.id})">${iEdt} Edit</button></div>
+                    <div class="card-actions"><button class="icon-btn" onclick="event.stopPropagation(); editMatkul(${m.id})">${iEdt} Edit</button></div>
                 </div>
             </div>`; 
     });
