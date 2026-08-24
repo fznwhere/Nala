@@ -1,4 +1,5 @@
-// --- LOGIKA TOMBOL & MODAL ---
+let currentNavDate = new Date(); // Untuk melacak bulan di kalender
+
 function toggleFabMenu() {
     const menu = document.getElementById('fab-menu');
     menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
@@ -8,12 +9,16 @@ let currentCategory = '';
 function openModal(category) {
     currentCategory = category;
     document.getElementById('modal-title').innerText = `Tambah ${category}`;
+    
+    // Tampilkan pemilih warna hanya jika kategorinya "Acara"
+    document.getElementById('color-picker-container').style.display = category === 'Acara' ? 'block' : 'none';
+    
     document.getElementById('insert-modal').style.display = 'flex';
     toggleFabMenu(); 
 }
 
-function closeModal() {
-    document.getElementById('insert-modal').style.display = 'none';
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
 }
 
 function saveNewTask() {
@@ -21,101 +26,68 @@ function saveNewTask() {
     const date = document.getElementById('new-task-date').value;
     const time = document.getElementById('new-task-time').value;
 
-    if(!name || !date || !time) { 
-        alert("Nama, tanggal, dan jam wajib diisi!"); 
-        return; 
-    }
+    if(!name || !date || !time) return alert("Semua kolom wajib diisi!"); 
 
-    // Ambil jadwal lama, tambah yang baru, lalu simpan lagi
+    // Tentukan warna berdasarkan kategori (atau input kustom jika Acara)
+    let taskColor = currentCategory === 'Tugas' ? 'var(--color-tugas)' : document.getElementById('new-task-color').value;
+
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || [];
     savedTasks.push({
-        id: Date.now(),
-        name: name,
-        date: date,
-        time: time,
-        category: currentCategory.toLowerCase()
+        id: Date.now(), name: name, date: date, time: time,
+        category: currentCategory.toLowerCase(),
+        color: taskColor // Simpan kode warnanya
     });
 
     localStorage.setItem('nalaTasks', JSON.stringify(savedTasks));
-    closeModal();
+    closeModal('insert-modal');
     
-    // Refresh halaman agar langsung muncul
     if(document.getElementById('schedule-list')) loadTodaySchedule();
     if(document.getElementById('calendar-grid')) renderMonthCalendar();
 }
 
-// --- LOGIKA HALAMAN BERANDA (Jadwal Hari Ini) ---
-if(document.getElementById('schedule-list')) {
-    loadTodaySchedule();
-}
+// --- LOGIKA BERANDA ---
+if(document.getElementById('schedule-list')) loadTodaySchedule();
 
 async function loadTodaySchedule() {
     const list = document.getElementById('schedule-list');
-    list.innerHTML = '<p style="text-align:center; color:#9BBAD4; margin-top:20px;">Memuat jadwal otomatis...</p>';
+    list.innerHTML = '<p style="text-align:center; color:#9BBAD4;">Memuat jadwal otomatis...</p>';
     
-    // Dapatkan tanggal hari ini (Format YYYY-MM-DD)
     const today = new Date();
-    // Penyesuaian zona waktu lokal agar akurat
     const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    
     let combinedSchedule = [];
 
-    // 1. Ambil Jadwal Tambahan (Matkul, dll) dari LocalStorage
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || [];
-    let todaysTasks = savedTasks.filter(t => t.date === todayStr);
-    combinedSchedule = combinedSchedule.concat(todaysTasks);
+    combinedSchedule = combinedSchedule.concat(savedTasks.filter(t => t.date === todayStr));
 
-    // 2. Ambil Jadwal Salat dari API
     try {
         const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Yogyakarta&country=Indonesia&method=11');
         const data = await response.json();
         const timings = data.data.timings;
-        
         combinedSchedule.push(
-            { id: 's1', name: 'Salat Subuh & Mandi', time: timings.Fajr, category: 'rutinitas' },
-            { id: 's2', name: 'Salat Zuhur', time: timings.Dhuhr, category: 'rutinitas' },
-            { id: 's3', name: 'Salat Asar', time: timings.Asr, category: 'rutinitas' },
-            { id: 's4', name: 'Salat Maghrib', time: timings.Maghrib, category: 'rutinitas' },
-            { id: 's5', name: 'Salat Isya & Istirahat', time: timings.Isha, category: 'rutinitas' }
+            { name: 'Subuh', time: timings.Fajr, color: '#9BBAD4' },
+            { name: 'Zuhur', time: timings.Dhuhr, color: '#9BBAD4' },
+            { name: 'Asar', time: timings.Asr, color: '#9BBAD4' },
+            { name: 'Maghrib', time: timings.Maghrib, color: '#9BBAD4' },
+            { name: 'Isya', time: timings.Isha, color: '#9BBAD4' }
         );
-    } catch (error) {
-        console.error("Gagal mengambil jadwal salat dari internet.", error);
-    }
+    } catch (e) { console.log("Gagal memuat jadwal salat."); }
 
-    // Urutkan semua kegiatan dari pagi sampai malam berdasarkan JAM
     combinedSchedule.sort((a, b) => a.time.localeCompare(b.time));
-
-    // Render ke HTML
-    list.innerHTML = '';
-    if(combinedSchedule.length === 0) {
-        list.innerHTML = '<p style="text-align:center; color:#9BBAD4; margin-top:20px;">Belum ada jadwal tersimpan hari ini.</p>';
-        return;
-    }
+    list.innerHTML = combinedSchedule.length ? '' : '<p style="text-align:center; color:#9BBAD4;">Kosong.</p>';
 
     combinedSchedule.forEach(task => {
-        let borderColor = '#9BBAD4'; // Warna biru pudar untuk rutinitas (salat)
-        let displayCategory = 'Rutinitas Dasar';
-        
-        // Beri warna sesuai kategori
-        if(task.category === 'matkul') { borderColor = 'var(--color-matkul)'; displayCategory = 'Jadwal Kuliah'; }
-        if(task.category === 'tugas') { borderColor = 'var(--color-tugas)'; displayCategory = 'Tugas'; }
-        if(task.category === 'acara') { borderColor = 'var(--color-acara)'; displayCategory = 'Acara'; }
-
         list.innerHTML += `
-            <div class="card" style="border-left: 4px solid ${borderColor};">
-                <div class="task-info">
-                    <h3>${task.name}</h3>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-                        ⏰ ${task.time} | 🏷️ ${displayCategory}
-                    </p>
-                </div>
-            </div>
-        `;
+            <div class="card" style="border-left: 4px solid ${task.color};">
+                <h3>${task.name}</h3><p style="font-size: 12px; color: var(--text-muted);">⏰ ${task.time}</p>
+            </div>`;
     });
 }
 
-// --- LOGIKA HALAMAN KALENDER (Bulan Ini) ---
-if(document.getElementById('calendar-grid')) {
+// --- LOGIKA KALENDER ---
+if(document.getElementById('calendar-grid')) renderMonthCalendar();
+
+function changeMonth(offset) {
+    currentNavDate.setMonth(currentNavDate.getMonth() + offset);
     renderMonthCalendar();
 }
 
@@ -123,47 +95,43 @@ function renderMonthCalendar() {
     const grid = document.getElementById('calendar-grid');
     grid.innerHTML = '';
     
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    
-    document.getElementById('month-display').innerText = today.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+    const year = currentNavDate.getFullYear();
+    const month = currentNavDate.getMonth();
+    document.getElementById('month-display').innerText = currentNavDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
-    // Tambah Header Nama Hari
-    const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-    days.forEach(d => {
+    ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].forEach(d => {
         grid.innerHTML += `<div class="day-name">${d}</div>`;
     });
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || [];
 
-    // Kotak kosong untuk hari di awal bulan
-    for(let i = 0; i < firstDay; i++) {
-        grid.innerHTML += `<div></div>`;
-    }
+    for(let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
 
-    // Kotak Tanggal
     for(let i = 1; i <= daysInMonth; i++) {
         let currentLoopDate = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        
         let tasksThisDay = savedTasks.filter(t => t.date === currentLoopDate);
         
-        let dotsHtml = '';
-        tasksThisDay.forEach(t => {
-            dotsHtml += `<div class="dot ${t.category}"></div>`;
-        });
-
-        // Highlight kalau itu hari ini
-        let isToday = (today.getDate() === i) ? 'background-color: var(--btn-skip);' : '';
-
+        let dotsHtml = tasksThisDay.map(t => `<div class="dot" style="background-color: ${t.color};"></div>`).join('');
+        
         grid.innerHTML += `
-            <div class="day-cell" style="${isToday}">
+            <div class="day-cell" onclick="showDayDetails('${currentLoopDate}')">
                 <span class="day-number">${i}</span>
-                <div class="event-dots" style="margin-top:auto; display:flex; gap:3px;">${dotsHtml}</div>
-            </div>
-        `;
+                <div class="event-dots">${dotsHtml}</div>
+            </div>`;
     }
+}
+
+function showDayDetails(dateStr) {
+    let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || [];
+    let tasksThisDay = savedTasks.filter(t => t.date === dateStr);
+    
+    let listHtml = tasksThisDay.length 
+        ? tasksThisDay.map(t => `<div style="padding: 10px; border-left: 3px solid ${t.color}; margin-bottom: 5px; background: var(--bg-main); border-radius: 5px;">${t.time} - ${t.name}</div>`).join('')
+        : '<p style="color:var(--text-muted); font-size:14px;">Tidak ada acara.</p>';
+        
+    document.getElementById('detail-date-title').innerText = `Jadwal: ${dateStr}`;
+    document.getElementById('detail-list').innerHTML = listHtml;
+    document.getElementById('day-detail-modal').style.display = 'flex';
 }
