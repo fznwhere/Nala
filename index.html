@@ -9,7 +9,22 @@
 <body>
     <div class="app-container">
         <header><h1>Pola.</h1><p>Hari Ini</p></header>
+        
         <div id="schedule-list"></div>
+
+        <div class="upcoming-container">
+            <h2 class="section-title">Tugas Belum Selesai</h2>
+            <div id="upcoming-list"></div>
+        </div>
+
+        <div class="history-container">
+            <h2 class="section-title">Riwayat Selesai</h2>
+            <div class="history-tabs">
+                <button class="tab-btn active" id="tab-tk" onclick="renderHistory('Tugas Kuliah')">Tugas Kuliah</button>
+                <button class="tab-btn" id="tab-tb" onclick="renderHistory('Tugas')">Tugas</button>
+            </div>
+            <div id="history-list"></div>
+        </div>
 
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
@@ -20,7 +35,7 @@
         </div>
     </div>
 
-    <!-- Modal Form (Dipakai bareng) -->
+    <!-- Modal Form (Sama) -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
             <h2 id="modal-title">Tambah</h2>
@@ -42,7 +57,7 @@
                 <div id="field-tanggal"><label>Tanggal *</label><input type="date" id="new-task-date"></div>
                 <label>Jam *</label><input type="time" id="new-task-time">
                 <label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea>
-                <div id="field-warna" style="display: none;"><label>Warna Penanda</label><input type="color" id="new-task-color" value="#10B981"></div>
+                <div id="field-warna" style="display: none;"><label>Warna Penanda</label><input type="color" id="new-task-color" value="#059669"></div>
             </form>
             <div class="modal-btns">
                 <button onclick="closeModal('insert-modal')" class="btn-cancel">Batal</button>
