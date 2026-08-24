@@ -36,7 +36,6 @@
             <div id="history-list"></div>
         </div>
 
-        <!-- (Sisa kode Modal Day Details, Modal Edit Matkul, dan Modal Insert sama seperti sebelumnya) -->
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
                 <button onclick="openModal('Tugas Kuliah')">Tugas Kuliah</button>
@@ -46,7 +45,65 @@
         </div>
     </div>
     
-    <!-- (Abaikan penulisan ulang modal di sini agar pesan tidak terlalu panjang, kamu cukup copy-paste kerangka modal dari file kalender sebelumnya) -->
+    <!-- Modal Day Details (Pop-up saat tanggal diklik) -->
+    <div class="modal-overlay" id="day-detail-modal">
+        <div class="modal">
+            <h2 id="detail-date-title" style="font-size: 16px; margin-bottom: 15px;">Jadwal</h2>
+            <div id="detail-list" style="margin-bottom: 20px; max-height: 50vh; overflow-y: auto;"></div>
+            <div style="text-align: right;"><button onclick="closeModal('day-detail-modal')" class="btn-save">Tutup</button></div>
+        </div>
+    </div>
+
+    <!-- Modal Edit/Reschedule Matkul Khusus Hari Itu -->
+    <div class="modal-overlay" id="reschedule-modal">
+        <div class="modal">
+            <h2 style="font-size: 16px;">Ubah Jadwal Matkul Ini</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">(Hanya mengubah jadwal hari ini, minggu depan tetap normal)</p>
+            
+            <input type="hidden" id="res-matkulId">
+            <input type="hidden" id="res-originalDate">
+            
+            <label>Pindah ke Tanggal</label>
+            <input type="date" id="res-date">
+            <label>Ubah Jam</label>
+            <input type="time" id="res-time">
+            <label>Ubah Ruangan / Via</label>
+            <input type="text" id="res-ruang" placeholder="Msl: Zoom / Ruang 2">
+            <label>Dosen Pengganti (Jika ada)</label>
+            <input type="text" id="res-dosen">
+
+            <div class="modal-btns">
+                <button onclick="closeModal('reschedule-modal')" style="background:var(--bg-card); color:white;">Batal</button>
+                <button class="btn-save" onclick="saveReschedule()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Tugas -->
+    <div class="modal-overlay" id="insert-modal">
+        <div class="modal">
+            <h2 id="modal-title">Tambah</h2>
+            <form id="insert-form">
+                <input type="hidden" id="current-category">
+                <label>Nama / Judul *</label>
+                <input type="text" id="new-task-name" placeholder="Msl: Makalah Kelompok">
+                <div id="field-matkul-dropdown" style="display:none;">
+                    <label>Mata Kuliah</label>
+                    <select id="task-matkul-select"></select>
+                    <label>Pengumpulan</label>
+                    <input type="text" id="task-via" placeholder="Msl: G-Drive / E-Learning">
+                </div>
+                <label>Tgl Deadline *</label><input type="date" id="new-task-date">
+                <label>Jam Deadline *</label><input type="time" id="new-task-time">
+                <label>Deskripsi</label><textarea id="new-task-desc" rows="2"></textarea>
+                <div id="field-warna" style="display: none;"><label>Warna</label><input type="color" id="new-task-color"></div>
+            </form>
+            <div class="modal-btns">
+                <button onclick="closeModal('insert-modal')" style="background:var(--bg-card); color:white;">Batal</button>
+                <button class="btn-save" onclick="saveNewTask()">Simpan</button>
+            </div>
+        </div>
+    </div>
     
     <nav class="bottom-nav">
         <!-- Ikon navigasi sama seperti sebelumnya -->
