@@ -13,36 +13,46 @@
 
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
+                <button onclick="openModal('Rutinitas')">Rutinitas (Olahraga, dll)</button>
                 <button onclick="openModal('Acara')">Acara Bebas</button>
             </div>
             <div class="fab" onclick="toggleFabMenu()">+</div>
         </div>
     </div>
 
-    <!-- Modal Form (Dipakai bareng untuk Acara/Tugas) -->
+    <!-- Modal Form -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
             <h2 id="modal-title">Tambah</h2>
             <form id="insert-form">
                 <input type="hidden" id="current-category">
                 <label>Nama Kegiatan *</label>
-                <input type="text" id="new-task-name" placeholder="Msl: Rapat Himpunan">
+                <input type="text" id="new-task-name" placeholder="Msl: Workout / Rapat">
                 
-                <div id="field-matkul-dropdown" style="display:none;">
-                    <label>Pilih Matkul</label>
-                    <select id="task-matkul-select"></select>
-                    <label>Via / Pengumpulan</label>
-                    <input type="text" id="task-via" placeholder="Msl: Google Drive / Offline">
+                <!-- Khusus Rutinitas -->
+                <div id="field-rutinitas-hari" style="display: none;">
+                    <label>Pilih Hari Rutinitas *</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="routine-days" value="Senin"> Senin</label>
+                        <label><input type="checkbox" name="routine-days" value="Selasa"> Selasa</label>
+                        <label><input type="checkbox" name="routine-days" value="Rabu"> Rabu</label>
+                        <label><input type="checkbox" name="routine-days" value="Kamis"> Kamis</label>
+                        <label><input type="checkbox" name="routine-days" value="Jumat"> Jumat</label>
+                        <label><input type="checkbox" name="routine-days" value="Sabtu"> Sabtu</label>
+                        <label><input type="checkbox" name="routine-days" value="Minggu"> Minggu</label>
+                    </div>
                 </div>
 
-                <label>Tanggal Pelaksanaan/Deadline *</label>
-                <input type="date" id="new-task-date">
+                <div id="field-tanggal">
+                    <label>Tanggal Pelaksanaan *</label>
+                    <input type="date" id="new-task-date">
+                </div>
                 
                 <label>Jam *</label>
                 <input type="time" id="new-task-time">
-
+                
                 <label>Catatan / Deskripsi (Opsional)</label>
-                <textarea id="new-task-desc" rows="2" placeholder="Tulis rincian..."></textarea>
+                <textarea id="new-task-desc" rows="2"></textarea>
                 
                 <div id="field-warna" style="display: none;">
                     <label>Warna Penanda</label>
