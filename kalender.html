@@ -11,7 +11,7 @@
         <div class="calendar-header">
             <button onclick="changeMonth(-1)">&#10094;</button>
             <div style="position: relative; cursor: pointer;">
-                <h1 style="font-size: 24px; text-align: center; margin-bottom:0;">Pola.</h1>
+                <h1 style="font-size: 28px; text-align: center; margin-bottom:0; color: #0F172A; font-weight: 800;">Pola.</h1>
                 <p id="month-display-text" style="text-align: center; color: var(--text-muted); font-size: 14px; font-weight: bold;"></p>
                 <input type="month" id="native-month-picker" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0;">
             </div>
@@ -19,6 +19,20 @@
         </div>
 
         <div class="calendar-grid" id="calendar-grid"></div>
+
+        <div class="upcoming-container">
+            <h2 class="section-title">Tugas Belum Selesai</h2>
+            <div id="upcoming-list"></div>
+        </div>
+
+        <div class="history-container">
+            <h2 class="section-title">Riwayat Selesai</h2>
+            <div class="history-tabs">
+                <button class="tab-btn active" id="tab-tk" onclick="renderHistory('Tugas Kuliah')">Tugas Kuliah</button>
+                <button class="tab-btn" id="tab-tb" onclick="renderHistory('Tugas')">Tugas</button>
+            </div>
+            <div id="history-list"></div>
+        </div>
 
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
@@ -33,7 +47,7 @@
         <div class="modal">
             <h2 id="detail-date-title" style="font-size: 16px; margin-bottom: 15px;">Jadwal</h2>
             <div id="detail-list" style="margin-bottom: 20px; max-height: 50vh; overflow-y: auto;"></div>
-            <div style="text-align: right;"><button onclick="closeModal('day-detail-modal')" class="btn-save">Tutup</button></div>
+            <div class="modal-btns"><button onclick="closeModal('day-detail-modal')" class="btn-save">Tutup</button></div>
         </div>
     </div>
 
