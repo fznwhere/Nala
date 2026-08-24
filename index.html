@@ -14,51 +14,38 @@
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
                 <button onclick="openModal('Rutinitas')">Rutinitas</button>
-                <button onclick="openModal('Acara')">Acara Bebas</button>
+                <button onclick="openModal('Acara')">Acara</button>
             </div>
-            <div class="fab" onclick="toggleFabMenu()">+</div>
+            <div class="fab" onclick="toggleFabMenu()"></div>
         </div>
     </div>
 
-    <!-- Modal Form Sama Persis -->
+    <!-- Modal Form (Dipakai bareng) -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
             <h2 id="modal-title">Tambah</h2>
             <form id="insert-form">
                 <input type="hidden" id="current-category">
-                <label>Nama Kegiatan *</label>
-                <input type="text" id="new-task-name" placeholder="Msl: Workout / Rapat">
-                
+                <label>Nama Kegiatan *</label><input type="text" id="new-task-name">
                 <div id="field-rutinitas-hari" style="display: none;">
                     <label>Pilih Hari Rutinitas *</label>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" name="routine-days" value="Senin"> Senin</label>
-                        <label><input type="checkbox" name="routine-days" value="Selasa"> Selasa</label>
-                        <label><input type="checkbox" name="routine-days" value="Rabu"> Rabu</label>
-                        <label><input type="checkbox" name="routine-days" value="Kamis"> Kamis</label>
-                        <label><input type="checkbox" name="routine-days" value="Jumat"> Jumat</label>
-                        <label><input type="checkbox" name="routine-days" value="Sabtu"> Sabtu</label>
-                        <label><input type="checkbox" name="routine-days" value="Minggu"> Minggu</label>
+                        <label><input type="checkbox" name="routine-days" value="Senin">Sen</label>
+                        <label><input type="checkbox" name="routine-days" value="Selasa">Sel</label>
+                        <label><input type="checkbox" name="routine-days" value="Rabu">Rab</label>
+                        <label><input type="checkbox" name="routine-days" value="Kamis">Kam</label>
+                        <label><input type="checkbox" name="routine-days" value="Jumat">Jum</label>
+                        <label><input type="checkbox" name="routine-days" value="Sabtu">Sab</label>
+                        <label><input type="checkbox" name="routine-days" value="Minggu">Min</label>
                     </div>
                 </div>
-
-                <div id="field-tanggal">
-                    <label>Tanggal Pelaksanaan *</label>
-                    <input type="date" id="new-task-date">
-                </div>
-                
-                <label>Jam *</label>
-                <input type="time" id="new-task-time">
-                <label>Catatan / Deskripsi (Opsional)</label>
-                <textarea id="new-task-desc" rows="2"></textarea>
-                
-                <div id="field-warna" style="display: none;">
-                    <label>Warna Penanda</label>
-                    <input type="color" id="new-task-color" value="#A3D9A5">
-                </div>
+                <div id="field-tanggal"><label>Tanggal *</label><input type="date" id="new-task-date"></div>
+                <label>Jam *</label><input type="time" id="new-task-time">
+                <label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea>
+                <div id="field-warna" style="display: none;"><label>Warna Penanda</label><input type="color" id="new-task-color" value="#10B981"></div>
             </form>
             <div class="modal-btns">
-                <button onclick="closeModal('insert-modal')" style="background:var(--bg-card); color:white;">Batal</button>
+                <button onclick="closeModal('insert-modal')" class="btn-cancel">Batal</button>
                 <button class="btn-save" onclick="saveNewTask()">Simpan</button>
             </div>
         </div>
