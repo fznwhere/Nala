@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nala - Matkul</title>
+    <title>Pola - Matkul</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
-        <header><h1>Matkul.</h1><p>Database Semester Ini</p></header>
-        
+        <header><h1>Pola.</h1><p>Semester Ini</p></header>
         <div id="matkul-list"></div>
-
         <div class="fab-container">
             <div class="fab" onclick="openMatkulModal()">+</div>
         </div>
@@ -22,32 +20,19 @@
         <div class="modal">
             <h2>Data Mata Kuliah</h2>
             <form id="matkul-form">
-                <label>Nama Matkul *</label>
-                <input type="text" id="m-name" placeholder="Msl: Fisika Dasar">
-                
+                <label>Nama Matkul *</label><input type="text" id="m-name">
                 <label>Hari *</label>
                 <select id="m-hari">
                     <option value="Senin">Senin</option><option value="Selasa">Selasa</option>
                     <option value="Rabu">Rabu</option><option value="Kamis">Kamis</option>
                     <option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option>
                 </select>
-
                 <div style="display: flex; gap: 10px;">
-                    <div style="width: 50%;">
-                        <label>Jam Mulai *</label>
-                        <input type="time" id="m-jamMulai">
-                    </div>
-                    <div style="width: 50%;">
-                        <label>Jam Selesai</label>
-                        <input type="time" id="m-jamSelesai">
-                    </div>
+                    <div style="width: 50%;"><label>Jam Mulai *</label><input type="time" id="m-jamMulai"></div>
+                    <div style="width: 50%;"><label>Jam Selesai</label><input type="time" id="m-jamSelesai"></div>
                 </div>
-
-                <label>Dosen Pengampu</label>
-                <input type="text" id="m-dosen" placeholder="Nama Dosen">
-                
-                <label>Ruangan</label>
-                <input type="text" id="m-ruangan" placeholder="Msl: Lab. Komputer 2">
+                <label>Dosen Pengampu</label><input type="text" id="m-dosen">
+                <label>Ruangan</label><input type="text" id="m-ruangan">
             </form>
             <div class="modal-btns">
                 <button onclick="closeModal('matkul-modal')" style="background:var(--bg-card); color:white;">Batal</button>
@@ -56,8 +41,8 @@
         </div>
     </div>
 
-    <!-- Navigasi -->
     <nav class="bottom-nav">
+        <!-- Ikon navigasi sama seperti sebelumnya -->
         <a href="index.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
         <a href="kalender.html" class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></a>
         <a href="matkul.html" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></a>
