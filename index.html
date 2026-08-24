@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nala - Daily Tracker</title>
+    <!-- Import Font dari Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Palet Warna Muted Navy */
         :root {
             --bg-main: #2C3E50;
             --bg-card: #3E5266;
@@ -14,13 +18,15 @@
             --accent: #5D7A94;
             --btn-blue: #7E9CB9;
             --btn-skip: #4A6278;
+            --calendar-active: #9BBAD4;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Font Baru Diterapkan Di Sini */
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
@@ -30,7 +36,6 @@
             justify-content: center;
         }
 
-        /* Mobile Layout Container */
         .app-container {
             width: 100%;
             max-width: 480px;
@@ -41,19 +46,63 @@
         }
 
         header {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
         }
 
         header h1 {
             font-size: 28px;
-            letter-spacing: 1px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             margin-bottom: 5px;
         }
 
         header p {
             color: var(--text-muted);
             font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* --- UI Kalender Mingguan --- */
+        .calendar-strip {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            scrollbar-width: none; /* Sembunyikan scrollbar di Firefox */
+        }
+        
+        .calendar-strip::-webkit-scrollbar {
+            display: none; /* Sembunyikan scrollbar di Chrome/Safari */
+        }
+
+        .date-card {
+            background-color: var(--bg-card);
+            min-width: 55px;
+            padding: 10px 5px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .date-card.active {
+            background-color: var(--calendar-active);
+            color: var(--bg-main);
+            font-weight: 700;
+        }
+
+        .date-card .day {
+            font-size: 11px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .date-card .date {
+            font-size: 18px;
+            font-weight: 700;
         }
 
         /* Kartu Kegiatan */
@@ -66,7 +115,6 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
         }
 
         .card.skipped {
@@ -80,6 +128,7 @@
 
         .task-info h3 {
             font-size: 16px;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
@@ -90,7 +139,7 @@
 
         .actual-time {
             font-size: 12px;
-            color: #A3D9A5; /* Hijau pastel lembut untuk waktu aktual */
+            color: #A3D9A5;
             margin-top: 4px;
             display: block;
         }
@@ -105,25 +154,20 @@
             border-radius: 8px;
             padding: 8px 12px;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 600;
             color: var(--text-main);
             cursor: pointer;
         }
 
-        .btn-done {
-            background-color: var(--btn-blue);
-        }
+        .btn-done { background-color: var(--btn-blue); color: var(--bg-main); }
+        .btn-skip { background-color: var(--btn-skip); }
 
-        .btn-skip {
-            background-color: var(--btn-skip);
-        }
-
-        /* Floating Action Button (FAB) */
         .fab {
             position: fixed;
             bottom: 30px;
-            right: calc(50% - 240px + 20px); /* Menyesuaikan dengan max-width 480px */
+            right: calc(50% - 240px + 20px);
             background-color: var(--btn-blue);
+            color: var(--bg-main);
             width: 60px;
             height: 60px;
             border-radius: 50%;
@@ -135,14 +179,10 @@
             z-index: 10;
         }
 
-        /* Layar HP kecil fallback untuk letak FAB */
         @media (max-width: 480px) {
-            .fab {
-                right: 20px;
-            }
+            .fab { right: 20px; }
         }
 
-        /* Modal / Pop-up Jendela Kecil */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -161,9 +201,13 @@
             max-width: 320px;
         }
 
-        .modal h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
+        .modal h2 { font-size: 18px; margin-bottom: 15px; font-weight: 600; }
+        
+        .modal label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            display: block;
         }
 
         .modal input {
@@ -174,13 +218,10 @@
             border: none;
             background-color: var(--bg-main);
             color: var(--text-main);
+            font-family: inherit;
         }
 
-        .modal-btns {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; }
     </style>
 </head>
 <body>
@@ -188,21 +229,26 @@
     <div class="app-container">
         <header>
             <h1>Nala.</h1>
-            <p id="date-display">Memuat jadwal...</p>
+            <p id="month-display">Bulan</p>
         </header>
 
+        <!-- Kalender Mingguan -->
+        <div class="calendar-strip" id="calendar-strip">
+            <!-- Diisi oleh JavaScript -->
+        </div>
+
         <div id="schedule-list">
-            <!-- Kartu kegiatan akan di-render di sini oleh JavaScript -->
+            <!-- Kartu kegiatan -->
         </div>
 
         <div class="fab" onclick="openInsertModal()">+</div>
     </div>
 
-    <!-- Modal Konfirmasi Waktu Aktual -->
+    <!-- Modal Konfirmasi Waktu -->
     <div class="modal-overlay" id="done-modal">
         <div class="modal">
             <h2>Selesai jam berapa?</h2>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Sesuaikan jika kamu telat mengisi.</p>
+            <label>Sesuaikan jika kamu telat mengisi.</label>
             <input type="time" id="actual-time-input">
             <div class="modal-btns">
                 <button class="btn-skip" onclick="closeModal('done-modal')">Batal</button>
@@ -211,12 +257,19 @@
         </div>
     </div>
 
-    <!-- Modal Sisipkan Kegiatan Mendadak -->
+    <!-- Modal Sisipkan Kegiatan -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
-            <h2>Sisipkan Kegiatan</h2>
-            <input type="text" id="new-task-name" placeholder="Nama kegiatan (Msl: Rapat, Kerkom)">
+            <h2>Tambah Jadwal / Matkul</h2>
+            <label>Nama Kegiatan</label>
+            <input type="text" id="new-task-name" placeholder="Msl: Matkul Kalkulus, Rapat">
+            
+            <label>Tanggal Pelaksanaan</label>
+            <input type="date" id="new-task-date">
+            
+            <label>Jam Pelaksanaan</label>
             <input type="time" id="new-task-time">
+            
             <div class="modal-btns">
                 <button class="btn-skip" onclick="closeModal('insert-modal')">Batal</button>
                 <button class="btn-done" onclick="saveNewTask()">Tambah</button>
@@ -227,19 +280,51 @@
     <script>
         let schedule = [];
         let currentEditingId = null;
+        let selectedDate = new Date();
 
-        // Format tanggal hari ini
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('date-display').innerText = new Date().toLocaleDateString('id-ID', options);
+        // Setup UI Tanggal & Bulan
+        const monthOptions = { month: 'long', year: 'numeric' };
+        document.getElementById('month-display').innerText = selectedDate.toLocaleDateString('id-ID', monthOptions);
 
-        // Ambil data API Salat untuk Jogja
+        function generateCalendar() {
+            const strip = document.getElementById('calendar-strip');
+            strip.innerHTML = '';
+            
+            // Buat 7 hari ke depan
+            for(let i = 0; i < 7; i++) {
+                let d = new Date();
+                d.setDate(d.getDate() + i);
+                
+                let dayName = d.toLocaleDateString('id-ID', { weekday: 'short' });
+                let dateNum = d.getDate();
+                let fullDateStr = d.toISOString().split('T')[0];
+                
+                let isActive = i === 0 ? 'active' : ''; // Hari ini aktif secara default
+                
+                strip.innerHTML += `
+                    <div class="date-card ${isActive}" onclick="changeDate(this, '${fullDateStr}')">
+                        <div class="day">${dayName}</div>
+                        <div class="date">${dateNum}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function changeDate(element, dateStr) {
+            // Ubah UI kalender
+            document.querySelectorAll('.date-card').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            
+            // (Nantinya di sini logika untuk memfilter jadwal berdasarkan tanggal yang diklik)
+            alert("Fitur filter jadwal untuk tanggal " + dateStr + " siap disambungkan dengan database.");
+        }
+
         async function fetchSalatTimes() {
             try {
                 const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Yogyakarta&country=Indonesia&method=11');
                 const data = await response.json();
                 const timings = data.data.timings;
                 
-                // Susun jadwal jangkar
                 schedule = [
                     { id: 1, name: 'Salat Subuh & Mandi', planned: timings.Fajr, actual: null, status: 'pending' },
                     { id: 2, name: 'Salat Zuhur', planned: timings.Dhuhr, actual: null, status: 'pending' },
@@ -249,16 +334,13 @@
                 ];
                 renderSchedule();
             } catch (error) {
-                alert("Gagal mengambil data jadwal salat. Pastikan ada koneksi internet.");
+                alert("Gagal mengambil data jadwal.");
             }
         }
 
-        // Render kartu kegiatan ke layar
         function renderSchedule() {
             const list = document.getElementById('schedule-list');
-            list.innerHTML = ''; // Bersihkan list
-            
-            // Urutkan jadwal berdasarkan waktu
+            list.innerHTML = ''; 
             schedule.sort((a, b) => a.planned.localeCompare(b.planned));
 
             schedule.forEach(task => {
@@ -276,16 +358,14 @@
                     `;
                 }
 
-                let actualTimeHtml = task.actual ? `<span class="actual-time">Selesai aktual: ${task.actual}</span>` : '';
-                
-                // Coret waktu rencana jika sudah ada waktu aktual
+                let actualTimeHtml = task.actual ? `<span class="actual-time">Selesai: ${task.actual}</span>` : '';
                 let plannedHtml = task.actual ? `<s>${task.planned}</s>` : task.planned;
 
                 list.innerHTML += `
                     <div class="${cardClass}">
                         <div class="task-info">
                             <h3>${task.name}</h3>
-                            <div class="task-time">Rencana: ${plannedHtml} ${actualTimeHtml}</div>
+                            <div class="task-time">${plannedHtml} ${actualTimeHtml}</div>
                         </div>
                         ${buttons}
                     </div>
@@ -293,17 +373,13 @@
             });
         }
 
-        // --- Logika Modal Selesai ---
         function openDoneModal(id) {
             currentEditingId = id;
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('actual-time-input').value = `${hours}:${minutes}`;
+            document.getElementById('actual-time-input').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             document.getElementById('done-modal').style.display = 'flex';
         }
 
-        // Logika DOMINO (Geser jadwal ke bawah)
         function saveDoneTask() {
             const actualTime = document.getElementById('actual-time-input').value;
             const taskIndex = schedule.findIndex(t => t.id === currentEditingId);
@@ -311,39 +387,30 @@
             schedule[taskIndex].actual = actualTime;
             schedule[taskIndex].status = 'done';
 
-            // Hitung selisih waktu (dalam menit) untuk menggeser jadwal selanjutnya
-            const plannedTime = schedule[taskIndex].planned;
-            const plannedMins = timeToMins(plannedTime);
+            const plannedMins = timeToMins(schedule[taskIndex].planned);
             const actualMins = timeToMins(actualTime);
-            
             const delay = actualMins - plannedMins;
 
-            // Jika telat, dorong semua jadwal di bawahnya
             if (delay > 0) {
                 for (let i = taskIndex + 1; i < schedule.length; i++) {
                     if (schedule[i].status === 'pending') {
-                        let newTimeMins = timeToMins(schedule[i].planned) + delay;
-                        schedule[i].planned = minsToTime(newTimeMins);
+                        schedule[i].planned = minsToTime(timeToMins(schedule[i].planned) + delay);
                     }
                 }
             }
-
             closeModal('done-modal');
             renderSchedule();
         }
 
         function skipTask(id) {
-            const taskIndex = schedule.findIndex(t => t.id === id);
-            schedule[taskIndex].status = 'skipped';
+            schedule.find(t => t.id === id).status = 'skipped';
             renderSchedule();
         }
 
-        // --- Logika Modal Sisipkan Kegiatan ---
         function openInsertModal() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            document.getElementById('new-task-time').value = `${hours}:${minutes}`;
+            document.getElementById('new-task-time').value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            document.getElementById('new-task-date').value = now.toISOString().split('T')[0]; // Set default ke hari ini
             document.getElementById('new-task-name').value = '';
             document.getElementById('insert-modal').style.display = 'flex';
         }
@@ -351,16 +418,15 @@
         function saveNewTask() {
             const name = document.getElementById('new-task-name').value;
             const time = document.getElementById('new-task-time').value;
+            const date = document.getElementById('new-task-date').value;
             
-            if (!name) return alert("Nama kegiatan harus diisi!");
-
-            // Buat ID baru
-            const newId = schedule.length > 0 ? Math.max(...schedule.map(t => t.id)) + 1 : 1;
+            if (!name || !date) return alert("Nama dan tanggal harus diisi!");
             
             schedule.push({
-                id: newId,
+                id: schedule.length > 0 ? Math.max(...schedule.map(t => t.id)) + 1 : 1,
                 name: name,
                 planned: time,
+                date: date, // Menyimpan tanggal yang dipilih
                 actual: null,
                 status: 'pending'
             });
@@ -373,22 +439,17 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // Utility: Ubah "13:30" jadi menit (810)
         function timeToMins(timeStr) {
             const [h, m] = timeStr.split(':').map(Number);
             return (h * 60) + m;
         }
 
-        // Utility: Ubah menit (810) jadi "13:30"
         function minsToTime(mins) {
-            // Batasi maksimal 24 jam (1440 menit)
             if (mins >= 1440) mins = mins % 1440;
-            const h = String(Math.floor(mins / 60)).padStart(2, '0');
-            const m = String(mins % 60).padStart(2, '0');
-            return `${h}:${m}`;
+            return `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
         }
 
-        // Jalankan saat aplikasi dibuka
+        generateCalendar();
         fetchSalatTimes();
     </script>
 </body>
