@@ -42,7 +42,22 @@
                         <label><input type="checkbox" name="routine-days" value="Minggu">Min</label>
                     </div>
                 </div>
-                <div id="field-tanggal"><label>Tanggal *</label><input type="date" id="new-task-date"></div>
+                <div id="field-warna" style="display: none;">
+    <label>Warna Penanda</label>
+    <div class="color-swatches" id="color-swatches-container">
+        <div class="swatch" data-color="#4A7C59" style="background-color: #4A7C59;"></div>
+        <div class="swatch" data-color="#364958" style="background-color: #364958;"></div>
+        <div class="swatch" data-color="#A36B69" style="background-color: #A36B69;"></div>
+        <div class="swatch" data-color="#795C48" style="background-color: #795C48;"></div>
+        <div class="swatch" data-color="#3E5A47" style="background-color: #3E5A47;"></div>
+        <div class="swatch" data-color="#723D46" style="background-color: #723D46;"></div>
+        <div class="swatch" data-color="#5A4A6F" style="background-color: #5A4A6F;"></div>
+        <div class="swatch" data-color="#5F7485" style="background-color: #5F7485;"></div>
+        <div class="swatch" data-color="#AD6A51" style="background-color: #AD6A51;"></div>
+        <div class="swatch" data-color="#8C6239" style="background-color: #8C6239;"></div>
+    </div>
+    <input type="hidden" id="new-task-color" value="#4A7C59">
+</div>
                 <label>Jam *</label><input type="time" id="new-task-time">
                 <label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea>
                 <div id="field-warna" style="display: none;"><label>Warna Penanda</label><input type="color" id="new-task-color" value="#059669"></div>
