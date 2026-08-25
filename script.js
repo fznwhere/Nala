@@ -7,18 +7,19 @@ const liburNasional = {
     "2026-08-25": "Maulid Nabi Muhammad SAW", "2026-12-25": "Hari Raya Natal"
 };
 
-// --- SVG DIREVISI: HANYA OUTLINE ---
-const iClk = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
-const iEdt = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
-const iUsr = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
-const iRom = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M7 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"></path><path d="M15 12h.01"></path></svg>`;
-const iDat = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+// --- SVG DIREVISI: FILL BG-MAIN & STROKE COKLAT ---
+const strk = "var(--text-muted)";
+const fll = "var(--bg-main)";
+const iClk = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${fll}" stroke="${strk}" stroke-width="2"></circle><polyline points="12 6 12 12 16 14" fill="none" stroke="${strk}" stroke-width="2"></polyline></svg>`;
+const iDat = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" fill="${fll}" stroke="${strk}" stroke-width="2"></rect><line x1="16" y1="2" x2="16" y2="6" stroke="${strk}" stroke-width="2"></line><line x1="8" y1="2" x2="8" y2="6" stroke="${strk}" stroke-width="2"></line><line x1="3" y1="10" x2="21" y2="10" stroke="${strk}" stroke-width="2"></line></svg>`;
+const iCir = `<svg class="svg-icon" style="width:22px;height:22px;margin:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${fll}" stroke="${strk}" stroke-width="2"></circle></svg>`;
+const iChkCir = `<svg class="svg-icon" style="width:22px;height:22px;margin:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${fll}" stroke="${strk}" stroke-width="2"></circle><path d="M8 12.5L10.5 15L16 9" fill="none" stroke="${strk}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+
+const iEdt = `<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="${strk}" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+const iUsr = `<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="${strk}" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
+const iRom = `<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="${strk}" stroke-width="2"><path d="M3 21h18"></path><path d="M7 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"></path><path d="M15 12h.01"></path></svg>`;
 const iPls = `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
-// Ikon Ceklist Kosong
-const iCir = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
-// Ikon Ceklist Terisi
-const iChkCir = `<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
-const iDel = `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+const iDel = `<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="${strk}" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
 function toggleFabMenu() { const menu = document.getElementById('fab-menu'); if(menu) menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; editId = null; }
@@ -97,7 +98,8 @@ async function loadTodaySchedule() {
     todaysMatkul = todaysMatkul.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === todayStr));
     let movedIn = overrides.filter(o => o.newDate === todayStr).map(o => { let orig = savedMatkul.find(m => m.id === o.matkulId); return orig ? { ...orig, ...o, isOverride: true } : null; }).filter(x => x);
     [...todaysMatkul, ...movedIn].forEach(m => {
-        combinedSchedule.push({ type: 'kuliah', id: m.id, name: `${m.name}`, badge: 'Kuliah', time: m.isOverride ? m.newTime : m.jamMulai, endTime: m.jamSelesai || '', color: 'var(--color-kuliah)', ruang: m.isOverride ? m.newRuangan : m.ruangan, dosen: m.isOverride ? m.newDosen : m.dosen });
+        let eTime = m.isOverride && m.newEndTime !== undefined ? m.newEndTime : (m.jamSelesai || '');
+        combinedSchedule.push({ type: 'kuliah', id: m.id, name: `${m.name}`, badge: 'Kuliah', time: m.isOverride ? m.newTime : m.jamMulai, endTime: eTime, color: 'var(--color-kuliah)', ruang: m.isOverride ? m.newRuangan : m.ruangan, dosen: m.isOverride ? m.newDosen : m.dosen });
     });
 
     savedTasks.filter(t => t.date === todayStr).forEach(t => {
@@ -315,8 +317,8 @@ function renderHistory(tabName) {
                         <div class="card-title-group">
                             <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iChkCir}</button>
                             <div>
-                                <h3 class="dimmed-text">${t.name}</h3>
-                                <small class="dimmed-text">${iDat} ${formatShortDate(t.date)}</small>
+                                <h3 style="text-decoration:line-through; color: var(--state-dimmed);">${t.name}</h3>
+                                <small style="color: var(--state-dimmed);">${iDat} ${formatShortDate(t.date)}</small>
                             </div>
                         </div>
                     </div>
@@ -390,16 +392,14 @@ function showDayDetails(dateStr, dayName) {
     let finalMatkuls = [...matkulsToday, ...movedIn]; let listHtml = '';
     
     finalMatkuls.forEach(m => {
-        let time = m.isOverride ? m.newTime : m.jamMulai; let end = m.jamSelesai || ''; let ruang = m.isOverride ? m.newRuangan : m.ruangan; let dosen = m.isOverride ? m.newDosen : m.dosen; let origDate = m.isOverride ? m.originalDate : dateStr;
+        let time = m.isOverride ? m.newTime : m.jamMulai; let end = m.isOverride && m.newEndTime !== undefined ? m.newEndTime : (m.jamSelesai || ''); let ruang = m.isOverride ? m.newRuangan : m.ruangan; let dosen = m.isOverride ? m.newDosen : m.dosen; let origDate = m.isOverride ? m.originalDate : dateStr;
         listHtml += `
             <div class="card" onclick="toggleDetail(this)" style="margin-bottom:10px;">
                 <div class="card-header" style="background-color: var(--color-kuliah); padding:12px 16px;">
-                    <div class="card-header-top">
-                        <div class="card-title-group">
-                            <div>
-                                <h3 style="font-size:14px;">${m.name}</h3>
-                                <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
-                            </div>
+                    <div class="card-header-content">
+                        <div>
+                            <h3 style="font-size:14px;">${m.name}</h3>
+                            <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
                         </div>
                     </div>
                 </div>
@@ -411,7 +411,6 @@ function showDayDetails(dateStr, dayName) {
     });
     
     if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal.</p>';
-    
     let holidayText = isHoliday ? ` ${isHoliday}` : '';
     document.getElementById('detail-date-title').innerText = `${formatShortDate(dateStr)}${holidayText}`; 
     document.getElementById('detail-list').innerHTML = listHtml; document.getElementById('day-detail-modal').style.display = 'flex';
@@ -422,32 +421,41 @@ function openRescheduleModal(matkulId, origDate, activeDate) {
     let original = savedMatkul.find(m => m.id === matkulId); let existing = overrides.find(o => o.matkulId === matkulId && o.originalDate === origDate);
     document.getElementById('res-matkulId').value = matkulId; document.getElementById('res-originalDate').value = origDate; 
     document.getElementById('res-date').value = existing ? existing.newDate : activeDate; document.getElementById('res-time').value = existing ? existing.newTime : original.jamMulai;
+    if(document.getElementById('res-time-end')) document.getElementById('res-time-end').value = existing && existing.newEndTime !== undefined ? existing.newEndTime : original.jamSelesai;
     document.getElementById('res-ruang').value = existing ? existing.newRuangan : original.ruangan; document.getElementById('res-dosen').value = existing ? existing.newDosen : original.dosen;
     document.getElementById('reschedule-modal').style.display = 'flex';
 }
 
 function saveReschedule() {
     const mId = parseInt(document.getElementById('res-matkulId').value); const origDate = document.getElementById('res-originalDate').value;
+    const timeEndInput = document.getElementById('res-time-end'); const newEndTime = timeEndInput ? timeEndInput.value : '';
     let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || []; overrides = overrides.filter(o => !(o.matkulId === mId && o.originalDate === origDate));
-    overrides.push({ matkulId: mId, originalDate: origDate, newDate: document.getElementById('res-date').value, newTime: document.getElementById('res-time').value, newRuangan: document.getElementById('res-ruang').value, newDosen: document.getElementById('res-dosen').value });
+    overrides.push({ matkulId: mId, originalDate: origDate, newDate: document.getElementById('res-date').value, newTime: document.getElementById('res-time').value, newEndTime: newEndTime, newRuangan: document.getElementById('res-ruang').value, newDosen: document.getElementById('res-dosen').value });
     localStorage.setItem('nalaOverrides', JSON.stringify(overrides)); closeModal('reschedule-modal'); renderMonthCalendar();
 }
 
+// --- MODAL TAMBAH TUGAS/ACARA/RUTIN/LIBUR/KULIAH ---
 function openModal(category) {
     editId = null; document.getElementById('modal-title').innerText = `Tambah ${category}`; document.getElementById('insert-form').reset();
-    if(document.getElementById('field-matkul-dropdown')) document.getElementById('field-matkul-dropdown').style.display = (category === 'Tugas Kuliah') ? 'block' : 'none';
-    if(document.getElementById('field-rutinitas-hari')) document.getElementById('field-rutinitas-hari').style.display = (category === 'Rutinitas') ? 'block' : 'none';
     
+    document.getElementById('field-nama-kegiatan').style.display = (category === 'Kuliah') ? 'none' : 'block';
+    if(document.getElementById('field-matkul-dropdown')) document.getElementById('field-matkul-dropdown').style.display = (category === 'Tugas Kuliah' || category === 'Kuliah') ? 'block' : 'none';
+    if(document.getElementById('field-pengumpulan')) document.getElementById('field-pengumpulan').style.display = (category === 'Tugas Kuliah') ? 'block' : 'none';
+    if(document.getElementById('field-ruangan')) document.getElementById('field-ruangan').style.display = (category === 'Kuliah') ? 'block' : 'none';
+    
+    if(document.getElementById('field-rutinitas-hari')) document.getElementById('field-rutinitas-hari').style.display = (category === 'Rutinitas') ? 'block' : 'none';
     if(document.getElementById('field-warna')) { document.getElementById('field-warna').style.display = (category === 'Acara' || category === 'Rutinitas') ? 'block' : 'none'; }
     if(document.getElementById('field-tanggal')) document.getElementById('field-tanggal').style.display = (category === 'Rutinitas') ? 'none' : 'block';
     if(document.getElementById('field-tanggal-selesai')) { document.getElementById('field-tanggal-selesai').style.display = (category === 'Libur') ? 'block' : 'none'; }
+    
     if(document.getElementById('field-jam')) document.getElementById('field-jam').style.display = (category === 'Libur') ? 'none' : 'block';
-    if(document.getElementById('field-desc')) document.getElementById('field-desc').style.display = (category === 'Libur') ? 'none' : 'block';
+    if(document.getElementById('field-jam-selesai')) document.getElementById('field-jam-selesai').style.display = (category === 'Kuliah') ? 'block' : 'none';
+    if(document.getElementById('field-desc')) document.getElementById('field-desc').style.display = (category === 'Libur' || category === 'Kuliah') ? 'none' : 'block';
     
     document.getElementById('current-category').value = category;
     if(document.getElementById('new-task-color')) updateSwatchSelection(category === 'Rutinitas' ? '#8C6239' : '#3E5A47');
     
-    if(category === 'Tugas Kuliah') {
+    if(category === 'Tugas Kuliah' || category === 'Kuliah') {
         const sel = document.getElementById('task-matkul-select'); sel.innerHTML = '<option value="">-- Pilih Kuliah --</option>';
         let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; savedMatkul.forEach(m => sel.innerHTML += `<option value="${m.name}">${m.name}</option>`);
     }
@@ -489,9 +497,7 @@ function saveNewTask() {
     const category = document.getElementById('current-category').value; const name = document.getElementById('new-task-name').value;
     
     if(category === 'Libur') {
-        const date = document.getElementById('new-task-date').value;
-        const endDateInput = document.getElementById('new-task-date-end');
-        const endDate = (endDateInput && endDateInput.value) ? endDateInput.value : date;
+        const date = document.getElementById('new-task-date').value; const endDateInput = document.getElementById('new-task-date-end'); const endDate = (endDateInput && endDateInput.value) ? endDateInput.value : date;
         if(!name || !date) return alert("Nama dan Tanggal Mulai wajib diisi!");
         let liburData = { id: editId ? editId : Date.now(), name: name, startDate: date, endDate: endDate };
         let savedLibur = JSON.parse(localStorage.getItem('nalaLibur')) || [];
@@ -506,10 +512,22 @@ function saveNewTask() {
         let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
         if(editId) { const idx = savedRoutines.findIndex(r => r.id == editId); if(idx !== -1) savedRoutines[idx] = routineData; } else { savedRoutines.push(routineData); }
         localStorage.setItem('nalaRoutines', JSON.stringify(savedRoutines));
-    } 
+    }
+    else if(category === 'Kuliah') {
+        const matkulId = document.getElementById('task-matkul-select').value; const date = document.getElementById('new-task-date').value; const time = document.getElementById('new-task-time').value;
+        const endTime = document.getElementById('new-task-time-end').value; const ruang = document.getElementById('new-task-ruang').value;
+        if(!matkulId || !date || !time) return alert("Pilih Kuliah, Tanggal, dan Jam Mulai!");
+        
+        let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let orig = savedMatkul.find(m => m.id == matkulId);
+        if(!orig) return alert("Data kuliah tidak ditemukan!");
+
+        let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
+        overrides.push({ matkulId: parseInt(matkulId), originalDate: 'EXTRA_'+Date.now(), newDate: date, newTime: time, newEndTime: endTime, newRuangan: ruang || orig.ruangan, newDosen: orig.dosen });
+        localStorage.setItem('nalaOverrides', JSON.stringify(overrides));
+    }
     else {
-        const time = document.getElementById('new-task-time').value;
-        const date = document.getElementById('new-task-date').value; if(!name || !date || !time) return alert("Semua wajib diisi!"); 
+        const time = document.getElementById('new-task-time').value; const date = document.getElementById('new-task-date').value; 
+        if(!name || !date || !time) return alert("Semua wajib diisi!"); 
         let taskData = { id: editId ? editId : Date.now(), name: name, date: date, time: time, category: category, status: 'pending', deskripsi: document.getElementById('new-task-desc').value };
         if(category === 'Tugas Kuliah') { taskData.color = 'var(--color-tugas)'; taskData.matkulId = document.getElementById('task-matkul-select').value; taskData.pengumpulan = document.getElementById('task-via').value; } 
         else if (category === 'Acara') { taskData.color = document.getElementById('new-task-color') ? document.getElementById('new-task-color').value : 'var(--color-acara)'; } 
