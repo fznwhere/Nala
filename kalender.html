@@ -9,15 +9,15 @@
 <body>
     <div class="app-container">
         
-        <!-- Header Kalender Terkunci di Tengah -->
-        <div class="calendar-header" style="position: relative; display: flex; justify-content: center; align-items: center; height: 60px; margin-bottom: 20px;">
-            <button onclick="changeMonth(-1)" style="position: absolute; left: 0;">&#10094;</button>
-            <div style="position: relative; cursor: pointer; text-align: center;">
-                <h1 class="brand-title">Pola<span class="brand-dot">.</span></h1>
-                <p id="month-display-text" style="color: var(--text-muted); font-size: 13px; font-weight: bold;"></p>
+        <!-- HEADER TERKUNCI (Sejajar dengan index & matkul) -->
+        <div class="calendar-header">
+            <button class="btn-prev" onclick="changeMonth(-1)">&#10094;</button>
+            <div style="position: relative; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <h1 class="brand-title" style="margin-bottom: 2px;">Pola<span class="brand-dot">.</span></h1>
+                <p id="month-display-text" style="color: var(--text-muted); font-size: 14px; font-weight: 500;"></p>
                 <input type="month" id="native-month-picker" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor: pointer;">
             </div>
-            <button onclick="changeMonth(1)" style="position: absolute; right: 0;">&#10095;</button>
+            <button class="btn-next" onclick="changeMonth(1)">&#10095;</button>
         </div>
 
         <div class="calendar-grid" id="calendar-grid"></div>
@@ -46,6 +46,7 @@
         </div>
     </div>
     
+    <!-- POP UP DETAIL KALENDER -->
     <div class="modal-overlay" id="day-detail-modal">
         <div class="modal">
             <h2 id="detail-date-title" style="font-size: 16px; margin-bottom: 15px;">Jadwal</h2>
@@ -54,6 +55,7 @@
         </div>
     </div>
 
+    <!-- MODAL RESCHEDULE -->
     <div class="modal-overlay" id="reschedule-modal">
         <div class="modal">
             <h2 style="font-size: 16px;">Ubah Jadwal Ini</h2>
@@ -71,6 +73,7 @@
         </div>
     </div>
 
+    <!-- MODAL INSERT -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
             <h2 id="modal-title">Tambah</h2>
@@ -85,7 +88,6 @@
                 <label>Jam *</label><input type="time" id="new-task-time">
                 <label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea>
                 
-                <!-- BAGIAN WARNA BARU YANG DISISIPKAN -->
                 <div id="field-warna" style="display: none;">
                     <label>Warna Penanda</label>
                     <div class="color-swatches" id="color-swatches-container">
@@ -102,8 +104,6 @@
                     </div>
                     <input type="hidden" id="new-task-color" value="#4A7C59">
                 </div>
-                <!-- SELESAI -->
-
             </form>
             <div class="modal-btns">
                 <button onclick="closeModal('insert-modal')" class="btn-cancel">Batal</button>
