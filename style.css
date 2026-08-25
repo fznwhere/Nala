@@ -52,13 +52,7 @@ header { text-align: center; margin-bottom: 25px; }
 
 header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-top: -2px; }
 .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
-
-/* SVG ICON (DIUBAH AGAR MENGGUNAKAN STROKE WARNA TEKS, BUKAN FILL HITAM) */
-.svg-icon { vertical-align: text-bottom; width: 14px; height: 14px; margin-right: 4px; fill: none; stroke: var(--text-main); }
-/* Khusus icon di dalam Card yang header-nya berwarna, ganti stroke jadi putih */
-.card-header .svg-icon { stroke: #FFFFFF; }
-/* Khusus icon di jadwal yang sudah selesai (dimmed), warnanya menyesuaikan */
-.card-header .dimmed-text .svg-icon { stroke: var(--state-dimmed); }
+.svg-icon { vertical-align: text-bottom; width: 14px; height: 14px; margin-right: 4px; }
 
 .fab-container { position: fixed; bottom: 90px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; z-index: 10; }
 .fab-menu { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; align-items: flex-end; }
@@ -88,23 +82,17 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
 .card { background-color: var(--bg-card); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05); border: 1px solid var(--border-line); }
 .card:active { transform: scale(0.98); }
 .card-header { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; color: white; }
-
-/* STRUKTUR CARD HEADER BARU (Judul di kiri, Pil di kanan) */
 .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
 .card-title-group { display: flex; align-items: flex-start; gap: 8px; }
-.card-header h3 { font-size: 15px; margin: 0; font-weight: 700; line-height: 1.2; }
+.card-header h3 { font-size: 15px; margin: 0; font-weight: 700; transition: 0.2s; line-height: 1.2; }
 .card-header small { display: flex; align-items: center; margin-top: 4px; }
 .card-header .time-badge { font-size: 12px; font-weight: 600; opacity: 0.9; margin-top: 2px; }
 .dimmed-text { text-decoration: line-through; color: var(--state-dimmed) !important; }
-
-/* PIL KATEGORI (Tag Transparan Mentok Kanan) */
 .tag-pill { background: rgba(255, 255, 255, 0.25); border: 1px solid rgba(255, 255, 255, 0.4); padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; height: fit-content; }
 
-/* TOMBOL CEKLIST DENGAN FILL MENGIKUTI BACKGROUND */
-.check-btn { background: var(--bg-main); border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; margin-top: -1px; }
-.check-btn:active { transform: scale(0.9); }
-/* SVG di dalam tombol ceklist menggunakan outline tebal */
-.check-btn svg { width: 22px; height: 22px; stroke: var(--text-main); stroke-width: 2.5; fill: none; margin: 0; }
+/* FIX BACKGROUND CEKLIST TRANSPARAN */
+.check-btn { background: transparent; border: none; cursor: pointer; opacity: 0.9; transition: 0.2s; display: flex; align-items: center; padding: 0; margin-top: -1px; }
+.check-btn:active { transform: scale(0.9); opacity: 1; }
 
 .card-detail { display: none; padding: 16px; background-color: var(--bg-card); color: var(--text-main); }
 .card-detail.show { display: block; }
@@ -118,7 +106,7 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
 .card-actions.three-btns { justify-content: space-between; }
 .card-actions.three-btns > div { display: flex; gap: 8px; }
 
-.countdown-badge { background: #FFFFFF; color: var(--text-main); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; display: inline-block; white-space: nowrap; height: fit-content; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.countdown-badge { background: #FFFFFF; color: var(--text-main); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; display: inline-block; white-space: nowrap; align-self: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .countdown-alert { color: var(--alert-brutal); }
 .upcoming-container, .history-container { margin-top: 35px; }
 .history-tabs { display: flex; gap: 10px; margin-bottom: 15px; margin-top: 10px; }
