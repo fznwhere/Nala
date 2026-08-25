@@ -7,7 +7,6 @@ const liburNasional = {
     "2026-08-25": "Maulid Nabi Muhammad SAW", "2026-12-25": "Hari Raya Natal"
 };
 
-// --- SVG DIREVISI: FILL BG-MAIN & STROKE COKLAT ---
 const strk = "var(--text-muted)";
 const fll = "var(--bg-main)";
 const iClk = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${fll}" stroke="${strk}" stroke-width="2"></circle><polyline points="12 6 12 12 16 14" fill="none" stroke="${strk}" stroke-width="2"></polyline></svg>`;
@@ -164,7 +163,6 @@ async function loadTodaySchedule() {
     });
 }
 
-// --- KALENDER (TUGAS MENDATANG & RIWAYAT) ---
 if(document.getElementById('calendar-grid')) {
     renderMonthCalendar(); renderHistory('Tugas Kuliah'); renderUpcomingTasks();
     let tabsContainer = document.querySelector('.history-tabs');
@@ -317,8 +315,8 @@ function renderHistory(tabName) {
                         <div class="card-title-group">
                             <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iChkCir}</button>
                             <div>
-                                <h3 style="text-decoration:line-through; color: var(--state-dimmed);">${t.name}</h3>
-                                <small style="color: var(--state-dimmed);">${iDat} ${formatShortDate(t.date)}</small>
+                                <h3 class="dimmed-text">${t.name}</h3>
+                                <small class="dimmed-text">${iDat} ${formatShortDate(t.date)}</small>
                             </div>
                         </div>
                     </div>
@@ -396,10 +394,12 @@ function showDayDetails(dateStr, dayName) {
         listHtml += `
             <div class="card" onclick="toggleDetail(this)" style="margin-bottom:10px;">
                 <div class="card-header" style="background-color: var(--color-kuliah); padding:12px 16px;">
-                    <div class="card-header-content">
-                        <div>
-                            <h3 style="font-size:14px;">${m.name}</h3>
-                            <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
+                    <div class="card-header-top">
+                        <div class="card-title-group">
+                            <div>
+                                <h3 style="font-size:14px;">${m.name}</h3>
+                                <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -434,7 +434,6 @@ function saveReschedule() {
     localStorage.setItem('nalaOverrides', JSON.stringify(overrides)); closeModal('reschedule-modal'); renderMonthCalendar();
 }
 
-// --- MODAL TAMBAH TUGAS/ACARA/RUTIN/LIBUR/KULIAH ---
 function openModal(category) {
     editId = null; document.getElementById('modal-title').innerText = `Tambah ${category}`; document.getElementById('insert-form').reset();
     
@@ -457,7 +456,13 @@ function openModal(category) {
     
     if(category === 'Tugas Kuliah' || category === 'Kuliah') {
         const sel = document.getElementById('task-matkul-select'); sel.innerHTML = '<option value="">-- Pilih Kuliah --</option>';
-        let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; savedMatkul.forEach(m => sel.innerHTML += `<option value="${m.name}">${m.name}</option>`);
+        let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; 
+        
+        // Mencegah duplikasi nama matkul di dropdown jika user memasukkan matkul yang sama di hari berbeda
+        let uniqueMatkul = [];
+        savedMatkul.forEach(m => {
+            if(!uniqueMatkul.includes(m.name)) { uniqueMatkul.push(m.name); sel.innerHTML += `<option value="${m.name}">${m.name}</option>`; }
+        });
     }
     document.getElementById('insert-modal').style.display = 'flex'; toggleFabMenu(); 
 }
@@ -513,16 +518,18 @@ function saveNewTask() {
         if(editId) { const idx = savedRoutines.findIndex(r => r.id == editId); if(idx !== -1) savedRoutines[idx] = routineData; } else { savedRoutines.push(routineData); }
         localStorage.setItem('nalaRoutines', JSON.stringify(savedRoutines));
     }
+    // PERBAIKAN BUG KULIAH 1 HARI (Pencarian Berdasarkan Nama Matkul)
     else if(category === 'Kuliah') {
-        const matkulId = document.getElementById('task-matkul-select').value; const date = document.getElementById('new-task-date').value; const time = document.getElementById('new-task-time').value;
+        const matkulName = document.getElementById('task-matkul-select').value; const date = document.getElementById('new-task-date').value; const time = document.getElementById('new-task-time').value;
         const endTime = document.getElementById('new-task-time-end').value; const ruang = document.getElementById('new-task-ruang').value;
-        if(!matkulId || !date || !time) return alert("Pilih Kuliah, Tanggal, dan Jam Mulai!");
+        if(!matkulName || !date || !time) return alert("Pilih Kuliah, Tanggal, dan Jam Mulai!");
         
-        let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let orig = savedMatkul.find(m => m.id == matkulId);
+        let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; 
+        let orig = savedMatkul.find(m => m.name === matkulName);
         if(!orig) return alert("Data kuliah tidak ditemukan!");
 
         let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
-        overrides.push({ matkulId: parseInt(matkulId), originalDate: 'EXTRA_'+Date.now(), newDate: date, newTime: time, newEndTime: endTime, newRuangan: ruang || orig.ruangan, newDosen: orig.dosen });
+        overrides.push({ matkulId: orig.id, originalDate: 'EXTRA_'+Date.now(), newDate: date, newTime: time, newEndTime: endTime, newRuangan: ruang || orig.ruangan, newDosen: orig.dosen });
         localStorage.setItem('nalaOverrides', JSON.stringify(overrides));
     }
     else {
