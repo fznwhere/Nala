@@ -25,6 +25,18 @@ function formatShortDate(dateStr) {
     if(parts.length !== 3) return dateStr; return `${parts[2]}-${parts[1]}-${parts[0].substring(2)}`;
 }
 
+// LOGIKA LIBUR KUSTOM PENGGUNA
+function isUserHoliday(dateStr) {
+    let savedLibur = JSON.parse(localStorage.getItem('nalaLibur')) || [];
+    let tDate = new Date(dateStr); tDate.setHours(0,0,0,0);
+    for(let l of savedLibur) {
+        let sDate = new Date(l.startDate); sDate.setHours(0,0,0,0);
+        let eDate = new Date(l.endDate); eDate.setHours(0,0,0,0);
+        if(tDate >= sDate && tDate <= eDate) return l.name;
+    }
+    return null;
+}
+
 function updateSwatchSelection(colorVal) {
     if(!document.getElementById('new-task-color')) return;
     document.getElementById('new-task-color').value = colorVal;
@@ -42,6 +54,7 @@ function toggleDismiss(type, id, dateStr) {
     localStorage.setItem('nalaDismissed', JSON.stringify(dismissed)); refreshAllViews();
 }
 function isDismissed(type, id, dateStr) { return (JSON.parse(localStorage.getItem('nalaDismissed')) || []).includes(`${type}_${id}_${dateStr}`); }
+
 function deleteTask(id) {
     if(!confirm('Hapus jadwal ini?')) return;
     let tasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; tasks = tasks.filter(t => t.id != id);
@@ -52,11 +65,19 @@ function deleteRoutine(id) {
     let routines = JSON.parse(localStorage.getItem('nalaRoutines')) || []; routines = routines.filter(r => r.id != id);
     localStorage.setItem('nalaRoutines', JSON.stringify(routines)); refreshAllViews();
 }
+function deleteLibur(id) {
+    if(!confirm('Hapus jadwal libur ini?')) return;
+    let libur = JSON.parse(localStorage.getItem('nalaLibur')) || []; libur = libur.filter(l => l.id != id);
+    localStorage.setItem('nalaLibur', JSON.stringify(libur)); refreshAllViews();
+}
+
 function refreshAllViews() {
     if(document.getElementById('schedule-list')) loadTodaySchedule();
     if(document.getElementById('calendar-grid')) { renderMonthCalendar(); renderUpcomingTasks(); renderHistory(currentHistoryTab); }
+    if(document.getElementById('matkul-list')) renderMatkulList();
 }
 
+// --- BERANDA ---
 if(document.getElementById('schedule-list')) loadTodaySchedule();
 
 async function loadTodaySchedule() {
@@ -67,9 +88,9 @@ async function loadTodaySchedule() {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
 
-    let isTodayHoliday = liburNasional[todayStr];
+    let isHoliday = liburNasional[todayStr] || isUserHoliday(todayStr);
     let todaysMatkul = savedMatkul.filter(m => m.hari === todayDayName);
-    if(todayDayName === 'Minggu' || isTodayHoliday) todaysMatkul = []; 
+    if(todayDayName === 'Minggu' || isHoliday) todaysMatkul = []; 
     
     todaysMatkul = todaysMatkul.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === todayStr));
     let movedIn = overrides.filter(o => o.newDate === todayStr).map(o => { let orig = savedMatkul.find(m => m.id === o.matkulId); return orig ? { ...orig, ...o, isOverride: true } : null; }).filter(x => x);
@@ -136,6 +157,7 @@ async function loadTodaySchedule() {
     });
 }
 
+// --- KALENDER (TUGAS MENDATANG & RIWAYAT) ---
 if(document.getElementById('calendar-grid')) {
     renderMonthCalendar(); renderHistory('Tugas Kuliah'); renderUpcomingTasks();
     let tabsContainer = document.querySelector('.history-tabs');
@@ -194,6 +216,7 @@ function renderHistory(tabName) {
     if (tabName === 'Semua') {
         let tasks = JSON.parse(localStorage.getItem('nalaTasks')) || [];
         let routines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
+        let libur = JSON.parse(localStorage.getItem('nalaLibur')) || [];
         let allDataHtml = '';
         
         tasks.filter(t => t.category === 'Acara').sort((a,b) => b.date.localeCompare(a.date)).forEach(t => {
@@ -233,6 +256,28 @@ function renderHistory(tabName) {
                         <div class="card-actions three-btns">
                             <button class="icon-btn delete" onclick="event.stopPropagation(); deleteRoutine(${r.id})">${iDel} Hapus</button>
                             <div><button class="icon-btn" onclick="event.stopPropagation(); openEditRoutine(${r.id})">${iEdt} Edit</button></div>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        
+        libur.forEach(l => {
+            let dateText = l.startDate === l.endDate ? formatShortDate(l.startDate) : `${formatShortDate(l.startDate)} s/d ${formatShortDate(l.endDate)}`;
+            allDataHtml += `
+                <div class="card history-card" onclick="toggleDetail(this)">
+                    <div class="card-header" style="background-color: var(--color-minggu); opacity:0.9;">
+                        <div class="card-header-content">
+                            <div>
+                                <h3 style="color:#FFFFFF;">${l.name} <span class="tag-pill">Libur Kustom</span></h3>
+                                <small style="color:var(--state-dimmed);">${iDat} ${dateText}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-detail">
+                        <p>Libur Kampus / Pribadi</p>
+                        <div class="card-actions three-btns">
+                            <button class="icon-btn delete" onclick="event.stopPropagation(); deleteLibur(${l.id})">${iDel} Hapus</button>
+                            <div><button class="icon-btn" onclick="event.stopPropagation(); openEditLibur(${l.id})">${iEdt} Edit</button></div>
                         </div>
                     </div>
                 </div>`;
@@ -288,7 +333,7 @@ function renderMonthCalendar() {
         let currentLoopDate = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`; let loopDayName = namaHari[new Date(year, month, i).getDay()];
         
         let dayColors = []; 
-        let isHoliday = liburNasional[currentLoopDate];
+        let isHoliday = liburNasional[currentLoopDate] || isUserHoliday(currentLoopDate);
         let isOffDay = (loopDayName === 'Minggu') || isHoliday;
         
         let matkulsToday = savedMatkul.filter(m => m.hari === loopDayName); 
@@ -317,7 +362,7 @@ function renderMonthCalendar() {
 
 function showDayDetails(dateStr, dayName) {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
-    let isHoliday = liburNasional[dateStr]; let isOffDay = (dayName === 'Minggu') || isHoliday;
+    let isHoliday = liburNasional[dateStr] || isUserHoliday(dateStr); let isOffDay = (dayName === 'Minggu') || isHoliday;
 
     let matkulsToday = savedMatkul.filter(m => m.hari === dayName); 
     if(isOffDay) matkulsToday = []; 
@@ -347,7 +392,6 @@ function showDayDetails(dateStr, dayName) {
     
     if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal.</p>';
     
-    // Perubahan Format Judul Pop Up (Spasi Saja)
     let holidayText = isHoliday ? ` ${isHoliday}` : '';
     document.getElementById('detail-date-title').innerText = `${formatShortDate(dateStr)}${holidayText}`; 
     document.getElementById('detail-list').innerHTML = listHtml; document.getElementById('day-detail-modal').style.display = 'flex';
@@ -369,12 +413,26 @@ function saveReschedule() {
     localStorage.setItem('nalaOverrides', JSON.stringify(overrides)); closeModal('reschedule-modal'); renderMonthCalendar();
 }
 
+// --- MODAL TAMBAH TUGAS/ACARA/RUTIN/LIBUR ---
 function openModal(category) {
     editId = null; document.getElementById('modal-title').innerText = `Tambah ${category}`; document.getElementById('insert-form').reset();
     if(document.getElementById('field-matkul-dropdown')) document.getElementById('field-matkul-dropdown').style.display = (category === 'Tugas Kuliah') ? 'block' : 'none';
-    if(document.getElementById('field-warna')) document.getElementById('field-warna').style.display = (category === 'Acara' || category === 'Rutinitas') ? 'block' : 'none';
-    if(document.getElementById('field-tanggal')) document.getElementById('field-tanggal').style.display = (category === 'Rutinitas') ? 'none' : 'block';
     if(document.getElementById('field-rutinitas-hari')) document.getElementById('field-rutinitas-hari').style.display = (category === 'Rutinitas') ? 'block' : 'none';
+    
+    // Tampilan Warna
+    if(document.getElementById('field-warna')) {
+        document.getElementById('field-warna').style.display = (category === 'Acara' || category === 'Rutinitas') ? 'block' : 'none';
+    }
+    
+    // Tampilan Tanggal Mulai Selesai
+    if(document.getElementById('field-tanggal')) document.getElementById('field-tanggal').style.display = (category === 'Rutinitas') ? 'none' : 'block';
+    if(document.getElementById('field-tanggal-selesai')) {
+        document.getElementById('field-tanggal-selesai').style.display = (category === 'Libur') ? 'block' : 'none';
+    }
+
+    // Tampilan Jam & Deskripsi
+    if(document.getElementById('field-jam')) document.getElementById('field-jam').style.display = (category === 'Libur') ? 'none' : 'block';
+    if(document.getElementById('field-desc')) document.getElementById('field-desc').style.display = (category === 'Libur') ? 'none' : 'block';
     
     document.getElementById('current-category').value = category;
     if(document.getElementById('new-task-color')) updateSwatchSelection(category === 'Rutinitas' ? '#8C6239' : '#3E5A47');
@@ -407,17 +465,41 @@ function openEditRoutine(id) {
     }
 }
 
+function openEditLibur(id) {
+    openModal('Libur'); editId = id; document.getElementById('modal-title').innerText = `Edit Libur`;
+    let savedLibur = JSON.parse(localStorage.getItem('nalaLibur')) || []; let libur = savedLibur.find(l => l.id == id);
+    if(libur) {
+        document.getElementById('new-task-name').value = libur.name; 
+        document.getElementById('new-task-date').value = libur.startDate;
+        if(document.getElementById('new-task-date-end')) document.getElementById('new-task-date-end').value = libur.endDate;
+    }
+}
+
 function saveNewTask() {
-    const category = document.getElementById('current-category').value; const name = document.getElementById('new-task-name').value; const time = document.getElementById('new-task-time').value;
-    if(category === 'Rutinitas') {
+    const category = document.getElementById('current-category').value; const name = document.getElementById('new-task-name').value;
+    
+    if(category === 'Libur') {
+        const date = document.getElementById('new-task-date').value;
+        const endDateInput = document.getElementById('new-task-date-end');
+        const endDate = (endDateInput && endDateInput.value) ? endDateInput.value : date;
+        if(!name || !date) return alert("Nama dan Tanggal Mulai wajib diisi!");
+        let liburData = { id: editId ? editId : Date.now(), name: name, startDate: date, endDate: endDate };
+        let savedLibur = JSON.parse(localStorage.getItem('nalaLibur')) || [];
+        if(editId) { const idx = savedLibur.findIndex(l => l.id == editId); if(idx !== -1) savedLibur[idx] = liburData; } else { savedLibur.push(liburData); }
+        localStorage.setItem('nalaLibur', JSON.stringify(savedLibur));
+    } 
+    else if(category === 'Rutinitas') {
+        const time = document.getElementById('new-task-time').value;
         let selectedDays = []; document.querySelectorAll('input[name="routine-days"]:checked').forEach(cb => selectedDays.push(cb.value));
         if(!name || !time || selectedDays.length === 0) return alert("Nama, jam, dan hari wajib diisi!");
         let routineData = { id: editId ? editId : Date.now(), name: name, time: time, days: selectedDays, color: document.getElementById('new-task-color').value };
         let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
         if(editId) { const idx = savedRoutines.findIndex(r => r.id == editId); if(idx !== -1) savedRoutines[idx] = routineData; } else { savedRoutines.push(routineData); }
         localStorage.setItem('nalaRoutines', JSON.stringify(savedRoutines));
-    } else {
-        const date = document.getElementById('new-task-date').value; if(!name || !date || !time) return alert("Semua wajib diisi!"); 
+    } 
+    else {
+        const date = document.getElementById('new-task-date').value; const time = document.getElementById('new-task-time').value;
+        if(!name || !date || !time) return alert("Semua wajib diisi!"); 
         let taskData = { id: editId ? editId : Date.now(), name: name, date: date, time: time, category: category, status: 'pending', deskripsi: document.getElementById('new-task-desc').value };
         if(category === 'Tugas Kuliah') { taskData.color = 'var(--color-tugas)'; taskData.matkulId = document.getElementById('task-matkul-select').value; taskData.pengumpulan = document.getElementById('task-via').value; } 
         else if (category === 'Acara') { taskData.color = document.getElementById('new-task-color') ? document.getElementById('new-task-color').value : 'var(--color-acara)'; } 
@@ -430,6 +512,7 @@ function saveNewTask() {
     closeModal('insert-modal'); refreshAllViews();
 }
 
+// --- KULIAH PAGE ---
 if(document.getElementById('matkul-list')) renderMatkulList();
 function openMatkulModal() { editId = null; document.getElementById('matkul-form').reset(); document.getElementById('matkul-modal').style.display = 'flex'; }
 
@@ -439,7 +522,7 @@ function saveMatkul() {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || [];
     let matkulData = { id: editId ? editId : Date.now(), name: name, hari: hari, jamMulai: jamM, jamSelesai: document.getElementById('m-jamSelesai').value, dosen: document.getElementById('m-dosen').value, ruangan: document.getElementById('m-ruangan').value };
     if(editId) { const idx = savedMatkul.findIndex(m => m.id == editId); if(idx !== -1) savedMatkul[idx] = matkulData; } else { savedMatkul.push(matkulData); }
-    localStorage.setItem('nalaMatkul', JSON.stringify(savedMatkul)); closeModal('matkul-modal'); renderMatkulList();
+    localStorage.setItem('nalaMatkul', JSON.stringify(savedMatkul)); closeModal('matkul-modal'); refreshAllViews();
 }
 
 function renderMatkulList() {
