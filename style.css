@@ -13,25 +13,13 @@
     --btn-skip: #E6E2D8;      
     --border-line: #E6E2D8;   
 
-    /* --- WARNA KATEGORI (Default Sistem) --- */
+    /* --- WARNA KATEGORI --- */
     --color-kuliah: #4A6274;  
     --color-tugas: #6B4C7A;   
     --color-acara: #6B705C;   
     --color-rutin: #C08552;   
     --color-salat: #8A817C;   
     --color-minggu: #9C3838;  
-
-    /* --- WARNA KUSTOM PENGGUNA (Earthy Tone Swatches) --- */
-    --user-teal: #4A7C59;     
-    --user-navy: #364958;     
-    --user-rose: #A36B69;     
-    --user-mocha: #795C48;    
-    --user-forest: #3E5A47;   
-    --user-wine: #723D46;     
-    --user-eggplant: #5A4A6F; 
-    --user-steel: #5F7485;    
-    --user-copper: #AD6A51;   
-    --user-bronze: #8C6239;   
     
     /* --- STATUS & PERINGATAN --- */
     --alert-brutal: #B23A3A;  
@@ -50,14 +38,14 @@ body { background-color: var(--bg-main); color: var(--text-main); display: flex;
 header { text-align: center; margin-bottom: 25px; }
 
 /* TYPOGRAPHY LOGO */
-.brand-title { font-family: var(--font-logo); font-size: 32px; font-weight: 400; margin-bottom: 5px; color: var(--text-main); letter-spacing: 0.5px; }
+.brand-title { font-family: var(--font-logo); font-size: 32px; font-weight: 400; margin-bottom: 5px; color: var(--text-main); letter-spacing: 0.5px; line-height: 1; }
 .brand-dot { font-family: var(--font-logo); color: var(--btn-primary); }
 
 .time-badge, .countdown-badge, .day-number, .card-header small, input[type="time"], input[type="date"], #month-display-text, #detail-date-title { 
     font-family: var(--font-mono); 
 }
 
-header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-top: -2px; }
 .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
 .svg-icon { vertical-align: text-bottom; width: 14px; height: 14px; margin-right: 4px; stroke: currentColor; }
 
@@ -73,7 +61,11 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .nav-item.active svg { stroke: var(--btn-primary); transform: scale(1.1); }
 
 /* KALENDER */
-.calendar-header button { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-line); border-radius: 8px; padding: 5px 15px; font-weight: bold; cursor: pointer; }
+.calendar-header { display: flex; justify-content: center; align-items: flex-start; margin-bottom: 15px; position: relative; min-height: 55px; }
+.calendar-header button { position: absolute; top: 0; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-line); border-radius: 8px; padding: 5px 15px; font-weight: bold; cursor: pointer; z-index: 2; }
+.calendar-header button.btn-prev { left: 0; }
+.calendar-header button.btn-next { right: 0; }
+
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .day-name { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 700; }
 .day-cell { background-color: var(--bg-card); border-radius: 8px; aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; padding: 5px; cursor: pointer; border: 1px solid var(--border-line); transition: 0.2s; }
@@ -87,11 +79,16 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 /* KARTU JADWAL */
 .card { background-color: var(--bg-card); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05); border: 1px solid var(--border-line); }
 .card:active { transform: scale(0.98); }
-.card-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; color: white; }
-.card-header h3 { font-size: 15px; margin: 0; font-weight: 700; transition: 0.2s; }
-.card-header .time-badge { font-size: 12px; font-weight: 600; opacity: 0.9; }
+.card-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: flex-start; color: white; }
+.card-header-content { display: flex; align-items: center; gap: 8px; flex: 1; }
+.card-header h3 { font-size: 15px; margin: 0; font-weight: 700; transition: 0.2s; line-height: 1.2; }
+.card-header small { display: block; margin-top: 4px; }
+.card-header .time-badge { font-size: 12px; font-weight: 600; opacity: 0.9; margin-top: 2px; }
 
-.check-btn { background: none; border: none; color: white; cursor: pointer; opacity: 0.8; transition: 0.2s; display: flex; align-items: center; }
+/* PIL KATEGORI (Tag Transparan) */
+.tag-pill { background: rgba(255, 255, 255, 0.25); border: 1px solid rgba(255, 255, 255, 0.4); padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; margin-left: 10px; }
+
+.check-btn { background: none; border: none; color: white; cursor: pointer; opacity: 0.8; transition: 0.2s; display: flex; align-items: center; margin-top: -2px; }
 .check-btn:active { transform: scale(0.9); opacity: 1; }
 
 .card-detail { display: none; padding: 16px; background-color: var(--bg-card); color: var(--text-main); }
@@ -120,6 +117,7 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .modal h2 { color: var(--text-main); font-weight: 800; margin-bottom: 10px; }
 .modal label { font-size: 12px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; margin-top: 12px; }
 .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-line); background-color: var(--bg-main); color: var(--text-main); font-weight: 500; }
+.modal input[type="color"] { height: 40px; padding: 2px; }
 .modal-btns { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
 .modal-btns button { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
 .btn-save { background-color: var(--btn-primary); color: white; }
@@ -130,7 +128,7 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .checkbox-group label { background: var(--bg-main); padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border: 1px solid var(--border-line); }
 .checkbox-group input { accent-color: var(--btn-primary); }
 
-/* --- COLOR SWATCHES UI --- */
+/* COLOR SWATCHES UI */
 .color-swatches { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
 .swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s; position: relative; border: 2px solid transparent; }
 .swatch:hover { transform: scale(1.1); }
