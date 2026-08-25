@@ -1,20 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-    --bg-main: #F8FAFC; 
-    --bg-card: #FFFFFF; 
-    --text-main: #1E293B; 
-    --text-muted: #64748B; 
-    --btn-blue: #3B82F6; 
-    --btn-skip: #E2E8F0; 
-    --nav-bg: #FFFFFF;
+    /* --- TEMA DASAR (Earthy & Grounded) --- */
+    --bg-main: #FDFBF7;       /* Krem Pucat */
+    --bg-card: #FFFFFF;       /* Putih Bersih */
+    --text-main: #2D2A26;     /* Cokelat Ash / Gelap */
+    --text-muted: #7A756D;    /* Cokelat Pudar */
     
-    --color-kuliah: #2563EB; 
-    --color-tugas: #7C3AED; 
-    --color-acara: #059669; 
-    --color-rutin: #D97706; 
-    --color-salat: #475569; 
-    --color-minggu: #DC2626; 
+    /* --- KOMPONEN UI & NAVIGASI --- */
+    --nav-bg: #FFFFFF;        
+    --btn-primary: #C25934;   /* Terakota (Aksen Utama) */
+    --btn-skip: #E6E2D8;      /* Krem keabu-abuan */
+    --border-line: #E6E2D8;   /* Garis batas tipis */
+
+    /* --- WARNA KATEGORI (Earth Tone) --- */
+    --color-kuliah: #4A6274;  /* Slate Blue / Biru Baja */
+    --color-tugas: #6B4C7A;   /* Muted Plum / Ungu Redup */
+    --color-acara: #6B705C;   /* Olive Green / Hijau Zaitun */
+    --color-rutin: #C08552;   /* Ochre / Cokelat Mustard */
+    --color-salat: #8A817C;   /* Warm Gray / Abu Hangat */
+    --color-minggu: #9C3838;  /* Brick Red / Merah Bata */
+    
+    /* --- STATUS & PERINGATAN --- */
+    --alert-brutal: #B23A3A;  /* Merah Bata Pekat */
+    --state-dimmed: #E5E5E5;  /* Abu-abu pudar untuk text coret di bg warna */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -22,29 +31,32 @@ body { background-color: var(--bg-main); color: var(--text-main); display: flex;
 .app-container { width: 100%; max-width: 480px; min-height: 100vh; padding: 20px; padding-bottom: 100px; }
 
 header { text-align: center; margin-bottom: 25px; }
-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 5px; color: #0F172A; }
-header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 
+/* LOGO TYPOGRAPHY TRICK */
+.brand-title { font-size: 28px; font-weight: 800; margin-bottom: 5px; color: var(--text-main); }
+.brand-dot { color: var(--btn-primary); }
+
+header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .section-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text-main); }
 .svg-icon { vertical-align: text-bottom; width: 14px; height: 14px; margin-right: 4px; stroke: currentColor; }
 
 /* FAB & Navigasi */
 .fab-container { position: fixed; bottom: 90px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; z-index: 10; }
 .fab-menu { display: none; flex-direction: column; gap: 10px; margin-bottom: 15px; align-items: flex-end; }
-.fab-menu button { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--btn-skip); padding: 10px 16px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 14px; font-weight: 600; cursor: pointer; }
+.fab-menu button { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-line); padding: 10px 16px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-size: 14px; font-weight: 600; cursor: pointer; }
 .fab { background-color: var(--text-main); color: #FFF; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; transition: 0.2s; }
 .fab:active { transform: scale(0.95); }
 
-.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: var(--nav-bg); display: flex; justify-content: space-evenly; align-items: center; z-index: 9; border-top: 1px solid var(--btn-skip); }
+.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background-color: var(--nav-bg); display: flex; justify-content: space-evenly; align-items: center; z-index: 9; border-top: 1px solid var(--border-line); }
 .nav-item svg { width: 24px; height: 24px; stroke: var(--text-muted); fill: none; stroke-width: 2; transition: 0.2s; margin-right: 0; }
-.nav-item.active svg { stroke: var(--text-main); transform: scale(1.1); }
+.nav-item.active svg { stroke: var(--btn-primary); transform: scale(1.1); }
 
 /* KALENDER */
 .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.calendar-header button { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--btn-skip); border-radius: 8px; padding: 5px 15px; font-weight: bold; cursor: pointer; }
+.calendar-header button { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-line); border-radius: 8px; padding: 5px 15px; font-weight: bold; cursor: pointer; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .day-name { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 700; }
-.day-cell { background-color: var(--bg-card); border-radius: 8px; aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; padding: 5px; cursor: pointer; border: 1px solid var(--btn-skip); transition: 0.2s; }
+.day-cell { background-color: var(--bg-card); border-radius: 8px; aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; padding: 5px; cursor: pointer; border: 1px solid var(--border-line); transition: 0.2s; }
 .day-cell:active { transform: scale(0.95); }
 .day-cell.dimmed { opacity: 0.4; background-color: transparent; border-style: dashed; }
 .day-number { font-size: 14px; font-weight: 700; color: var(--text-main); }
@@ -52,8 +64,8 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .event-pill-container { width: 100%; height: 6px; padding: 0 4px; margin-top: auto; margin-bottom: 2px; }
 .event-pill { width: 100%; height: 100%; border-radius: 4px; }
 
-/* KARTU JADWAL (Shadow Dinaikkan) */
-.card { background-color: var(--bg-card); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.08); border: 1px solid var(--btn-skip); }
+/* KARTU JADWAL */
+.card { background-color: var(--bg-card); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05); border: 1px solid var(--border-line); }
 .card:active { transform: scale(0.98); }
 .card-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; color: white; }
 .card-header h3 { font-size: 15px; margin: 0; font-weight: 700; transition: 0.2s; }
@@ -65,34 +77,36 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .card-detail { display: none; padding: 16px; background-color: var(--bg-card); color: var(--text-main); }
 .card-detail.show { display: block; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.detail-item { display: flex; align-items: flex-start; font-size: 13px; font-weight: 600; }
+.detail-item { display: flex; align-items: flex-start; font-size: 13px; font-weight: 600; color: var(--text-main); }
 .detail-item span { display: block; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 2px; }
 
-.card-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--btn-skip); }
-.icon-btn { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--btn-skip); padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; font-size: 12px; font-weight: 700; }
-.icon-btn.delete { color: #DC2626; border-color: #FECACA; background: #FEF2F2; }
+.card-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-line); }
+.icon-btn { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-line); padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; font-size: 12px; font-weight: 700; }
+.icon-btn.delete { color: var(--alert-brutal); border-color: #F7E5E5; background: #FDF4F4; }
 .card-actions.three-btns { justify-content: space-between; }
 .card-actions.three-btns > div { display: flex; gap: 8px; }
 
 /* Bedge Hitung Mundur & Riwayat */
-.countdown-badge { background: #FFFFFF; color: var(--text-main); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; display: inline-block; white-space: nowrap; align-self: center; }
-.countdown-alert { color: var(--color-minggu); }
+.countdown-badge { background: #FFFFFF; color: var(--text-main); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; display: inline-block; white-space: nowrap; align-self: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.countdown-alert { color: var(--alert-brutal); }
 .upcoming-container, .history-container { margin-top: 35px; }
 .history-tabs { display: flex; gap: 10px; margin-bottom: 15px; margin-top: 10px; }
-.tab-btn { flex: 1; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--btn-skip); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.tab-btn { flex: 1; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-line); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 .tab-btn.active { background: var(--text-main); color: white; border-color: var(--text-main); }
 
 /* Modal & Input */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 20; backdrop-filter: blur(2px); }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45, 42, 38, 0.6); display: none; justify-content: center; align-items: center; z-index: 20; backdrop-filter: blur(2px); }
 .modal { background-color: var(--bg-card); padding: 24px; border-radius: 16px; width: 90%; max-width: 360px; max-height: 85vh; overflow-y: auto; }
 .modal h2 { color: var(--text-main); font-weight: 800; margin-bottom: 10px; }
 .modal label { font-size: 12px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; margin-top: 12px; }
-.modal input, .modal select, .modal textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--btn-skip); background-color: var(--bg-main); color: var(--text-main); font-weight: 500; }
+.modal input, .modal select, .modal textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-line); background-color: var(--bg-main); color: var(--text-main); font-weight: 500; }
+.modal input[type="color"] { height: 40px; padding: 2px; }
 .modal-btns { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
 .modal-btns button { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
-.btn-save { background-color: var(--text-main); color: white; }
+.btn-save { background-color: var(--btn-primary); color: white; }
 .btn-cancel { background-color: var(--btn-skip); color: var(--text-main); }
 
 /* Checkbox Rutinitas (Grid 3 Kolom) */
 .checkbox-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; margin-bottom: 15px; }
-.checkbox-group label { background: var(--bg-main); padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border: 1px solid var(--btn-skip); }
+.checkbox-group label { background: var(--bg-main); padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border: 1px solid var(--border-line); }
+.checkbox-group input { accent-color: var(--btn-primary); }
