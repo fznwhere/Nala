@@ -9,7 +9,6 @@
 <body>
     <div class="app-container">
         
-        <!-- HEADER TERKUNCI (Sejajar dengan index & matkul) -->
         <div class="calendar-header">
             <button class="btn-prev" onclick="changeMonth(-1)">&#10094;</button>
             <div style="position: relative; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; width: 100%;">
@@ -41,12 +40,13 @@
             <div class="fab-menu" id="fab-menu">
                 <button onclick="openModal('Tugas Kuliah')">Tugas Kuliah</button>
                 <button onclick="openModal('Tugas')">Tugas</button>
+                <button onclick="openModal('Libur')">Libur Kustom</button>
+                <button onclick="openMatkulModal()">Jadwal Kuliah</button>
             </div>
             <div class="fab" onclick="toggleFabMenu()"></div>
         </div>
     </div>
     
-    <!-- POP UP DETAIL KALENDER -->
     <div class="modal-overlay" id="day-detail-modal">
         <div class="modal">
             <h2 id="detail-date-title" style="font-size: 16px; margin-bottom: 15px;">Jadwal</h2>
@@ -55,7 +55,32 @@
         </div>
     </div>
 
-    <!-- MODAL RESCHEDULE -->
+    <!-- MODAL MATKUL (Dipanggil dari Kalender) -->
+    <div class="modal-overlay" id="matkul-modal">
+        <div class="modal">
+            <h2>Data Kuliah</h2>
+            <form id="matkul-form">
+                <label>Nama Kuliah *</label><input type="text" id="m-name">
+                <label>Hari *</label>
+                <select id="m-hari">
+                    <option value="Senin">Senin</option><option value="Selasa">Selasa</option>
+                    <option value="Rabu">Rabu</option><option value="Kamis">Kamis</option>
+                    <option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option>
+                </select>
+                <div style="display: flex; gap: 10px;">
+                    <div style="width: 50%;"><label>Jam Mulai *</label><input type="time" id="m-jamMulai"></div>
+                    <div style="width: 50%;"><label>Jam Selesai</label><input type="time" id="m-jamSelesai"></div>
+                </div>
+                <label>Dosen Pengampu</label><input type="text" id="m-dosen">
+                <label>Ruangan</label><input type="text" id="m-ruangan">
+            </form>
+            <div class="modal-btns">
+                <button onclick="closeModal('matkul-modal')" class="btn-cancel">Batal</button>
+                <button class="btn-save" onclick="saveMatkul()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="reschedule-modal">
         <div class="modal">
             <h2 style="font-size: 16px;">Ubah Jadwal Ini</h2>
@@ -73,7 +98,7 @@
         </div>
     </div>
 
-    <!-- MODAL INSERT -->
+    <!-- MODAL INSERT UTAMA -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
             <h2 id="modal-title">Tambah</h2>
@@ -84,9 +109,13 @@
                     <label>Mata Kuliah</label><select id="task-matkul-select"></select>
                     <label>Pengumpulan</label><input type="text" id="task-via">
                 </div>
-                <label>Tanggal *</label><input type="date" id="new-task-date">
-                <label>Jam *</label><input type="time" id="new-task-time">
-                <label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea>
+                
+                <div id="field-tanggal"><label>Tanggal Mulai *</label><input type="date" id="new-task-date"></div>
+                <!-- Khusus Libur Panjang -->
+                <div id="field-tanggal-selesai" style="display: none;"><label>Tanggal Selesai (Opsional)</label><input type="date" id="new-task-date-end"></div>
+                
+                <div id="field-jam"><label>Jam *</label><input type="time" id="new-task-time"></div>
+                <div id="field-desc"><label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea></div>
                 
                 <div id="field-warna" style="display: none;">
                     <label>Warna Penanda</label>
