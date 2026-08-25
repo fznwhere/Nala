@@ -7,14 +7,17 @@ const liburNasional = {
     "2026-08-25": "Maulid Nabi Muhammad SAW", "2026-12-25": "Hari Raya Natal"
 };
 
+// --- SVG DIREVISI: HANYA OUTLINE ---
 const iClk = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
 const iEdt = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
 const iUsr = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`;
 const iRom = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M7 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"></path><path d="M15 12h.01"></path></svg>`;
 const iDat = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
 const iPls = `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
-const iCir = `<svg class="svg-icon" style="width:20px;height:20px;margin:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg>`;
-const iChkCir = `<svg class="svg-icon" style="width:20px;height:20px;margin:0;" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+// Ikon Ceklist Kosong
+const iCir = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
+// Ikon Ceklist Terisi
+const iChkCir = `<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
 const iDel = `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
 
 function toggleFabMenu() { const menu = document.getElementById('fab-menu'); if(menu) menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'; }
@@ -25,7 +28,6 @@ function formatShortDate(dateStr) {
     if(parts.length !== 3) return dateStr; return `${parts[2]}-${parts[1]}-${parts[0].substring(2)}`;
 }
 
-// LOGIKA LIBUR KUSTOM PENGGUNA
 function isUserHoliday(dateStr) {
     let savedLibur = JSON.parse(localStorage.getItem('nalaLibur')) || [];
     let tDate = new Date(dateStr); tDate.setHours(0,0,0,0);
@@ -139,17 +141,20 @@ async function loadTodaySchedule() {
             </div>`;
         } else { detailHtml = `<p>${item.desc}</p>`; }
 
-        let badgeHtml = item.badge ? `<span class="tag-pill">${item.badge}</span>` : '';
+        let badgeHtml = item.badge ? `<span class="tag-pill" style="${titleStyle}">${item.badge}</span>` : '';
 
         list.innerHTML += `
             <div class="card" onclick="toggleDetail(this)" style="${cardOpacity}">
                 <div class="card-header" style="background-color: ${item.color};">
-                    <div class="card-header-content">
-                        <button class="check-btn" onclick="event.stopPropagation(); toggleDismiss('${item.type}', '${item.id}', '${todayStr}')">${btnIcon}</button>
-                        <div>
-                            <h3 style="${titleStyle}">${item.name} ${badgeHtml}</h3>
-                            <small class="time-badge" style="${titleStyle}">${iClk} ${item.time} ${item.endTime ? '- '+item.endTime : ''}</small>
+                    <div class="card-header-top">
+                        <div class="card-title-group">
+                            <button class="check-btn" onclick="event.stopPropagation(); toggleDismiss('${item.type}', '${item.id}', '${todayStr}')">${btnIcon}</button>
+                            <div>
+                                <h3 style="${titleStyle}">${item.name}</h3>
+                                <small class="time-badge" style="${titleStyle}">${iClk} ${item.time} ${item.endTime ? '- '+item.endTime : ''}</small>
+                            </div>
                         </div>
+                        ${badgeHtml}
                     </div>
                 </div>
                 <div class="card-detail">${detailHtml}</div>
@@ -184,14 +189,16 @@ function renderUpcomingTasks() {
         list.innerHTML += `
             <div class="card" onclick="toggleDetail(this)">
                 <div class="card-header" style="background-color: ${t.color || 'var(--color-tugas)'};">
-                    <div class="card-header-content">
-                        <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iCir}</button>
-                        <div>
-                            <h3>${t.name}</h3>
-                            <small>${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small>
+                    <div class="card-header-top">
+                        <div class="card-title-group">
+                            <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iCir}</button>
+                            <div>
+                                <h3>${t.name}</h3>
+                                <small>${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small>
+                            </div>
                         </div>
+                        <span class="${badgeClass}">${badgeText}</span>
                     </div>
-                    <span class="${badgeClass}">${badgeText}</span>
                 </div>
                 <div class="card-detail">
                     <p style="margin-bottom:12px; line-height:1.5;">${t.deskripsi || 'Tidak ada deskripsi.'}</p>
@@ -223,11 +230,14 @@ function renderHistory(tabName) {
             allDataHtml += `
                 <div class="card history-card" onclick="toggleDetail(this)">
                     <div class="card-header" style="background-color: ${t.color || 'var(--color-acara)'}; opacity:0.9;">
-                        <div class="card-header-content">
-                            <div>
-                                <h3 style="color:#FFFFFF;">${t.name} <span class="tag-pill">Acara</span></h3>
-                                <small style="color:var(--state-dimmed);">${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small>
+                        <div class="card-header-top">
+                            <div class="card-title-group">
+                                <div>
+                                    <h3 style="color:#FFFFFF;">${t.name}</h3>
+                                    <small style="color:var(--state-dimmed);">${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small>
+                                </div>
                             </div>
+                            <span class="tag-pill">Acara</span>
                         </div>
                     </div>
                     <div class="card-detail">
@@ -244,11 +254,14 @@ function renderHistory(tabName) {
             allDataHtml += `
                 <div class="card history-card" onclick="toggleDetail(this)">
                     <div class="card-header" style="background-color: ${r.color || 'var(--color-rutin)'}; opacity:0.9;">
-                        <div class="card-header-content">
-                            <div>
-                                <h3 style="color:#FFFFFF;">${r.name} <span class="tag-pill">Rutinitas</span></h3>
-                                <small style="color:var(--state-dimmed);">${iClk} ${r.time} | Setiap: ${r.days.join(', ')}</small>
+                        <div class="card-header-top">
+                            <div class="card-title-group">
+                                <div>
+                                    <h3 style="color:#FFFFFF;">${r.name}</h3>
+                                    <small style="color:var(--state-dimmed);">${iClk} ${r.time} | Setiap: ${r.days.join(', ')}</small>
+                                </div>
                             </div>
+                            <span class="tag-pill">Rutinitas</span>
                         </div>
                     </div>
                     <div class="card-detail">
@@ -266,11 +279,14 @@ function renderHistory(tabName) {
             allDataHtml += `
                 <div class="card history-card" onclick="toggleDetail(this)">
                     <div class="card-header" style="background-color: var(--color-minggu); opacity:0.9;">
-                        <div class="card-header-content">
-                            <div>
-                                <h3 style="color:#FFFFFF;">${l.name} <span class="tag-pill">Libur Kustom</span></h3>
-                                <small style="color:var(--state-dimmed);">${iDat} ${dateText}</small>
+                        <div class="card-header-top">
+                            <div class="card-title-group">
+                                <div>
+                                    <h3 style="color:#FFFFFF;">${l.name}</h3>
+                                    <small style="color:var(--state-dimmed);">${iDat} ${dateText}</small>
+                                </div>
                             </div>
+                            <span class="tag-pill">Libur</span>
                         </div>
                     </div>
                     <div class="card-detail">
@@ -295,11 +311,13 @@ function renderHistory(tabName) {
         list.innerHTML += `
             <div class="card history-card" onclick="toggleDetail(this)">
                 <div class="card-header" style="background-color: ${t.color || 'var(--color-tugas)'}; opacity:0.8;">
-                    <div class="card-header-content">
-                        <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iChkCir}</button>
-                        <div>
-                            <h3 style="text-decoration:line-through; color: var(--state-dimmed);">${t.name}</h3>
-                            <small style="color: var(--state-dimmed);">${iDat} ${formatShortDate(t.date)}</small>
+                    <div class="card-header-top">
+                        <div class="card-title-group">
+                            <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iChkCir}</button>
+                            <div>
+                                <h3 class="dimmed-text">${t.name}</h3>
+                                <small class="dimmed-text">${iDat} ${formatShortDate(t.date)}</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -376,10 +394,12 @@ function showDayDetails(dateStr, dayName) {
         listHtml += `
             <div class="card" onclick="toggleDetail(this)" style="margin-bottom:10px;">
                 <div class="card-header" style="background-color: var(--color-kuliah); padding:12px 16px;">
-                    <div class="card-header-content">
-                        <div>
-                            <h3 style="font-size:14px;">${m.name}</h3>
-                            <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
+                    <div class="card-header-top">
+                        <div class="card-title-group">
+                            <div>
+                                <h3 style="font-size:14px;">${m.name}</h3>
+                                <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -413,24 +433,14 @@ function saveReschedule() {
     localStorage.setItem('nalaOverrides', JSON.stringify(overrides)); closeModal('reschedule-modal'); renderMonthCalendar();
 }
 
-// --- MODAL TAMBAH TUGAS/ACARA/RUTIN/LIBUR ---
 function openModal(category) {
     editId = null; document.getElementById('modal-title').innerText = `Tambah ${category}`; document.getElementById('insert-form').reset();
     if(document.getElementById('field-matkul-dropdown')) document.getElementById('field-matkul-dropdown').style.display = (category === 'Tugas Kuliah') ? 'block' : 'none';
     if(document.getElementById('field-rutinitas-hari')) document.getElementById('field-rutinitas-hari').style.display = (category === 'Rutinitas') ? 'block' : 'none';
     
-    // Tampilan Warna
-    if(document.getElementById('field-warna')) {
-        document.getElementById('field-warna').style.display = (category === 'Acara' || category === 'Rutinitas') ? 'block' : 'none';
-    }
-    
-    // Tampilan Tanggal Mulai Selesai
+    if(document.getElementById('field-warna')) { document.getElementById('field-warna').style.display = (category === 'Acara' || category === 'Rutinitas') ? 'block' : 'none'; }
     if(document.getElementById('field-tanggal')) document.getElementById('field-tanggal').style.display = (category === 'Rutinitas') ? 'none' : 'block';
-    if(document.getElementById('field-tanggal-selesai')) {
-        document.getElementById('field-tanggal-selesai').style.display = (category === 'Libur') ? 'block' : 'none';
-    }
-
-    // Tampilan Jam & Deskripsi
+    if(document.getElementById('field-tanggal-selesai')) { document.getElementById('field-tanggal-selesai').style.display = (category === 'Libur') ? 'block' : 'none'; }
     if(document.getElementById('field-jam')) document.getElementById('field-jam').style.display = (category === 'Libur') ? 'none' : 'block';
     if(document.getElementById('field-desc')) document.getElementById('field-desc').style.display = (category === 'Libur') ? 'none' : 'block';
     
@@ -498,8 +508,8 @@ function saveNewTask() {
         localStorage.setItem('nalaRoutines', JSON.stringify(savedRoutines));
     } 
     else {
-        const date = document.getElementById('new-task-date').value; const time = document.getElementById('new-task-time').value;
-        if(!name || !date || !time) return alert("Semua wajib diisi!"); 
+        const time = document.getElementById('new-task-time').value;
+        const date = document.getElementById('new-task-date').value; if(!name || !date || !time) return alert("Semua wajib diisi!"); 
         let taskData = { id: editId ? editId : Date.now(), name: name, date: date, time: time, category: category, status: 'pending', deskripsi: document.getElementById('new-task-desc').value };
         if(category === 'Tugas Kuliah') { taskData.color = 'var(--color-tugas)'; taskData.matkulId = document.getElementById('task-matkul-select').value; taskData.pengumpulan = document.getElementById('task-via').value; } 
         else if (category === 'Acara') { taskData.color = document.getElementById('new-task-color') ? document.getElementById('new-task-color').value : 'var(--color-acara)'; } 
@@ -512,7 +522,6 @@ function saveNewTask() {
     closeModal('insert-modal'); refreshAllViews();
 }
 
-// --- KULIAH PAGE ---
 if(document.getElementById('matkul-list')) renderMatkulList();
 function openMatkulModal() { editId = null; document.getElementById('matkul-form').reset(); document.getElementById('matkul-modal').style.display = 'flex'; }
 
@@ -522,7 +531,7 @@ function saveMatkul() {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || [];
     let matkulData = { id: editId ? editId : Date.now(), name: name, hari: hari, jamMulai: jamM, jamSelesai: document.getElementById('m-jamSelesai').value, dosen: document.getElementById('m-dosen').value, ruangan: document.getElementById('m-ruangan').value };
     if(editId) { const idx = savedMatkul.findIndex(m => m.id == editId); if(idx !== -1) savedMatkul[idx] = matkulData; } else { savedMatkul.push(matkulData); }
-    localStorage.setItem('nalaMatkul', JSON.stringify(savedMatkul)); closeModal('matkul-modal'); refreshAllViews();
+    localStorage.setItem('nalaMatkul', JSON.stringify(savedMatkul)); closeModal('matkul-modal'); renderMatkulList();
 }
 
 function renderMatkulList() {
@@ -532,10 +541,12 @@ function renderMatkulList() {
         list.innerHTML += `
             <div class="card" onclick="toggleDetail(this)">
                 <div class="card-header" style="background-color: var(--color-kuliah);">
-                    <div class="card-header-content">
-                        <div>
-                            <h3>${m.name}</h3>
-                            <small class="time-badge">${m.hari}</small>
+                    <div class="card-header-top">
+                        <div class="card-title-group">
+                            <div>
+                                <h3 style="font-size:15px;">${m.name}</h3>
+                                <small class="time-badge">${m.hari}</small>
+                            </div>
                         </div>
                     </div>
                 </div>
