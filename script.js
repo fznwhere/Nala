@@ -383,7 +383,6 @@ function showDayDetails(dateStr, dayName) {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; 
     let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || [];
-    let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
     
     let isHoliday = liburNasional[dateStr] || isUserHoliday(dateStr); 
     let isOffDay = (dayName === 'Minggu') || isHoliday;
@@ -411,11 +410,6 @@ function showDayDetails(dateStr, dayName) {
         popUpItems.push({ type: 'tugasAcara', id: t.id, name: t.name, badge: tCat, time: t.time, endTime: '', color: t.color || 'var(--color-tugas)', desc: t.deskripsi, via: t.pengumpulan });
     });
 
-    // 3. Ambil Rutinitas
-    savedRoutines.filter(r => r.days.includes(dayName)).forEach(r => {
-        popUpItems.push({ type: 'rutin', id: r.id, name: r.name, badge: 'Rutinitas', time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: r.desc || 'Jadwal Rutinitas Mingguan' });
-    });
-
     // Urutkan berdasarkan jam
     popUpItems.sort((a, b) => a.time.localeCompare(b.time));
 
@@ -429,8 +423,6 @@ function showDayDetails(dateStr, dayName) {
                 <div class="card-actions"><button class="icon-btn" onclick="event.stopPropagation(); openRescheduleModal(${item.id}, '${item.origDate}', '${dateStr}')">${iEdt} Pindah Jadwal</button></div>`;
         } else if (item.type === 'tugasAcara') {
             detailHtml = `<p style="line-height:1.5;">${item.desc || 'Tidak ada deskripsi'}</p>${item.via ? `<div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--border-line);"><span>Via/Kumpul:</span> <strong>${item.via}</strong></div>` : ''}`;
-        } else {
-            detailHtml = `<p style="line-height:1.5;">${item.desc}</p>`;
         }
 
         listHtml += `
