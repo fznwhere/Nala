@@ -70,6 +70,9 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 
 .card-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--btn-skip); }
 .icon-btn { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--btn-skip); padding: 8px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; font-size: 12px; font-weight: 700; }
+.icon-btn.delete { color: #DC2626; border-color: #FECACA; background: #FEF2F2; }
+.card-actions.three-btns { justify-content: space-between; }
+.card-actions.three-btns > div { display: flex; gap: 8px; }
 
 /* Bedge Hitung Mundur & Riwayat */
 .countdown-badge { background: #FFFFFF; color: var(--text-main); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; display: inline-block; white-space: nowrap; align-self: center; }
