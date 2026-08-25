@@ -90,7 +90,6 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
 .dimmed-text { text-decoration: line-through; color: var(--state-dimmed) !important; }
 .tag-pill { background: rgba(255, 255, 255, 0.25); border: 1px solid rgba(255, 255, 255, 0.4); padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; height: fit-content; }
 
-/* FIX BACKGROUND CEKLIST TRANSPARAN */
 .check-btn { background: transparent; border: none; cursor: pointer; opacity: 0.9; transition: 0.2s; display: flex; align-items: center; padding: 0; margin-top: -1px; }
 .check-btn:active { transform: scale(0.9); opacity: 1; }
 
@@ -129,6 +128,7 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
 .checkbox-group input { accent-color: var(--btn-primary); }
 
 .color-swatches { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
-.swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s; position: relative; border: 2px solid transparent; }
+.swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s; position: relative; }
 .swatch:hover { transform: scale(1.1); }
-.swatch.selected { border-color: var(--text-main); transform: scale(1.1); box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--text-main); }
+/* REVISI CINCIN WARNA (SATU GARIS COKLAT, ADA JARAK) */
+.swatch.selected { outline: 2px solid var(--text-main); outline-offset: 3px; transform: scale(1.05); }
