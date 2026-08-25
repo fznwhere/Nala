@@ -1,0 +1,16 @@
+{
+  "name": "Pola.",
+  "short_name": "Pola",
+  "start_url": "/Nala/index.html",
+  "display": "standalone",
+  "background_color": "#FDFBF7",
+  "theme_color": "#FDFBF7",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
