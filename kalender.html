@@ -38,9 +38,9 @@
 
         <div class="fab-container">
             <div class="fab-menu" id="fab-menu">
-                <button onclick="openModal('Tugas Kuliah')">Tugas Kuliah</button>
                 <button onclick="openModal('Tugas')">Tugas</button>
-                <button onclick="openModal('Libur')">Libur Kustom</button>
+                <button onclick="openModal('Libur')">Libur</button>
+                <button onclick="openModal('Tugas Kuliah')">Tugas Kuliah</button>
                 <button onclick="openMatkulModal()">Jadwal Kuliah</button>
             </div>
             <div class="fab" onclick="toggleFabMenu()"></div>
@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <!-- MODAL MATKUL (Dipanggil dari Kalender) -->
+    <!-- MODAL MATKUL -->
     <div class="modal-overlay" id="matkul-modal">
         <div class="modal">
             <h2>Data Kuliah</h2>
@@ -111,7 +111,6 @@
                 </div>
                 
                 <div id="field-tanggal"><label>Tanggal Mulai *</label><input type="date" id="new-task-date"></div>
-                <!-- Khusus Libur Panjang -->
                 <div id="field-tanggal-selesai" style="display: none;"><label>Tanggal Selesai (Opsional)</label><input type="date" id="new-task-date-end"></div>
                 
                 <div id="field-jam"><label>Jam *</label><input type="time" id="new-task-time"></div>
