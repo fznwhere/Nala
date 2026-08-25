@@ -13,13 +13,25 @@
     --btn-skip: #E6E2D8;      
     --border-line: #E6E2D8;   
 
-    /* --- WARNA KATEGORI --- */
+    /* --- WARNA KATEGORI (Default Sistem) --- */
     --color-kuliah: #4A6274;  
     --color-tugas: #6B4C7A;   
     --color-acara: #6B705C;   
     --color-rutin: #C08552;   
     --color-salat: #8A817C;   
     --color-minggu: #9C3838;  
+
+    /* --- WARNA KUSTOM PENGGUNA (Earthy Tone Swatches) --- */
+    --user-teal: #4A7C59;     
+    --user-navy: #364958;     
+    --user-rose: #A36B69;     
+    --user-mocha: #795C48;    
+    --user-forest: #3E5A47;   
+    --user-wine: #723D46;     
+    --user-eggplant: #5A4A6F; 
+    --user-steel: #5F7485;    
+    --user-copper: #AD6A51;   
+    --user-bronze: #8C6239;   
     
     /* --- STATUS & PERINGATAN --- */
     --alert-brutal: #B23A3A;  
@@ -37,11 +49,10 @@ body { background-color: var(--bg-main); color: var(--text-main); display: flex;
 
 header { text-align: center; margin-bottom: 25px; }
 
-/* TYPOGRAPHY LOGO (DM Serif Display) */
+/* TYPOGRAPHY LOGO */
 .brand-title { font-family: var(--font-logo); font-size: 32px; font-weight: 400; margin-bottom: 5px; color: var(--text-main); letter-spacing: 0.5px; }
 .brand-dot { font-family: var(--font-logo); color: var(--btn-primary); }
 
-/* TARGET FONT MONO (JetBrains Mono) UNTUK ANGKA DATA */
 .time-badge, .countdown-badge, .day-number, .card-header small, input[type="time"], input[type="date"], #month-display-text, #detail-date-title { 
     font-family: var(--font-mono); 
 }
@@ -109,11 +120,19 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 .modal h2 { color: var(--text-main); font-weight: 800; margin-bottom: 10px; }
 .modal label { font-size: 12px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px; margin-top: 12px; }
 .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-line); background-color: var(--bg-main); color: var(--text-main); font-weight: 500; }
-.modal input[type="color"] { height: 40px; padding: 2px; }
 .modal-btns { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
 .modal-btns button { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
 .btn-save { background-color: var(--btn-primary); color: white; }
 .btn-cancel { background-color: var(--btn-skip); color: var(--text-main); }
+
+/* Checkbox Rutinitas */
 .checkbox-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; margin-bottom: 15px; }
 .checkbox-group label { background: var(--bg-main); padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border: 1px solid var(--border-line); }
 .checkbox-group input { accent-color: var(--btn-primary); }
+
+/* --- COLOR SWATCHES UI --- */
+.color-swatches { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s; position: relative; border: 2px solid transparent; }
+.swatch:hover { transform: scale(1.1); }
+.swatch.selected { border-color: var(--text-main); transform: scale(1.1); box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--text-main); }
+.swatch.selected::after { content: '✓'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px; font-weight: bold; }
