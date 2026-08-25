@@ -1,5 +1,23 @@
 let currentNavDate = new Date(); let editId = null; const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']; let currentHistoryTab = 'Tugas Kuliah';
 
+// --- DATABASE HARI LIBUR NASIONAL 2026 ---
+const liburNasional = {
+    "2026-01-01": "Tahun Baru Masehi",
+    "2026-02-18": "Isra Mikraj",
+    "2026-02-19": "Tahun Baru Imlek",
+    "2026-03-20": "Hari Raya Nyepi / Idul Fitri",
+    "2026-03-21": "Idul Fitri",
+    "2026-04-03": "Wafat Isa Al Masih",
+    "2026-05-01": "Hari Buruh Nasional",
+    "2026-05-14": "Kenaikan Isa Al Masih",
+    "2026-05-27": "Idul Adha",
+    "2026-05-31": "Hari Raya Waisak",
+    "2026-06-01": "Hari Lahir Pancasila",
+    "2026-08-17": "Hari Kemerdekaan RI",
+    "2026-08-25": "Maulid Nabi Muhammad SAW",
+    "2026-12-25": "Hari Raya Natal"
+};
+
 // --- LIBRARY IKON SVG ---
 const iClk = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
 const iEdt = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
@@ -9,7 +27,6 @@ const iDat = `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width=
 const iPls = `<svg viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
 const iCir = `<svg class="svg-icon" style="width:20px;height:20px;margin:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle></svg>`;
 const iChkCir = `<svg class="svg-icon" style="width:20px;height:20px;margin:0;" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
-const iRe = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>`;
 
 function toggleFabMenu() { const menu = document.getElementById('fab-menu'); if(menu) menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex'; }
 function closeModal(id) { document.getElementById(id).style.display = 'none'; editId = null; }
@@ -18,11 +35,7 @@ function toggleDetail(element) { const detail = element.querySelector('.card-det
 // --- LOGIKA UNDO/TOGGLE SELESAI ---
 function toggleTaskDone(id) {
     let tasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let idx = tasks.findIndex(t => t.id === id);
-    if(idx !== -1) { 
-        tasks[idx].status = tasks[idx].status === 'done' ? 'pending' : 'done'; 
-        localStorage.setItem('nalaTasks', JSON.stringify(tasks)); 
-        refreshAllViews();
-    }
+    if(idx !== -1) { tasks[idx].status = tasks[idx].status === 'done' ? 'pending' : 'done'; localStorage.setItem('nalaTasks', JSON.stringify(tasks)); refreshAllViews(); }
 }
 function toggleDismiss(type, id, dateStr) {
     if(type === 'tugas' || type === 'acara') { toggleTaskDone(id); return; }
@@ -47,14 +60,18 @@ async function loadTodaySchedule() {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
 
+    // Matkul (Cek Libur Nasional atau Minggu)
+    let isTodayHoliday = liburNasional[todayStr];
     let todaysMatkul = savedMatkul.filter(m => m.hari === todayDayName);
-    if(todayDayName === 'Minggu') todaysMatkul = [];
+    if(todayDayName === 'Minggu' || isTodayHoliday) todaysMatkul = []; // Diliburkan otomatis
+    
     todaysMatkul = todaysMatkul.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === todayStr));
     let movedIn = overrides.filter(o => o.newDate === todayStr).map(o => { let orig = savedMatkul.find(m => m.id === o.matkulId); return orig ? { ...orig, ...o, isOverride: true } : null; }).filter(x => x);
     [...todaysMatkul, ...movedIn].forEach(m => {
         combinedSchedule.push({ type: 'kuliah', id: m.id, name: `Kuliah: ${m.name}`, time: m.isOverride ? m.newTime : m.jamMulai, endTime: m.jamSelesai || '', color: 'var(--color-kuliah)', ruang: m.isOverride ? m.newRuangan : m.ruangan, dosen: m.isOverride ? m.newDosen : m.dosen });
     });
 
+    // Tugas, Acara, Rutinitas
     savedTasks.filter(t => t.date === todayStr).forEach(t => {
         combinedSchedule.push({ type: t.category.toLowerCase().includes('tugas') ? 'tugas' : 'acara', id: t.id, name: t.name, time: t.time, endTime: '', color: t.color || 'var(--color-acara)', desc: t.deskripsi || 'Tidak ada catatan.', via: t.pengumpulan, cat: t.category, status: t.status });
     });
@@ -62,6 +79,7 @@ async function loadTodaySchedule() {
         combinedSchedule.push({ type: 'rutin', id: r.id, name: r.name, time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: 'Jadwal Rutinitas Mingguan' });
     });
 
+    // Salat
     const salatNames = ['Subuh', 'Zuhur', 'Asar', 'Maghrib', 'Isya'];
     try {
         const t = (await (await fetch('https://api.aladhan.com/v1/timingsByCity?city=Yogyakarta&country=Indonesia&method=11')).json()).data.timings;
@@ -71,7 +89,7 @@ async function loadTodaySchedule() {
     }
 
     combinedSchedule.sort((a, b) => a.time.localeCompare(b.time));
-    list.innerHTML = combinedSchedule.length ? '' : '<p style="text-align:center; color:var(--text-muted);">Jadwal kosong.</p>';
+    list.innerHTML = combinedSchedule.length ? '' : '<p style="text-align:center; color:var(--text-muted);">Semua jadwal hari ini sudah beres! 🔥</p>';
     
     combinedSchedule.forEach(item => {
         let completed = (item.type === 'tugas' || item.type === 'acara') ? (item.status === 'done') : isDismissed(item.type, item.id, todayStr);
@@ -173,14 +191,24 @@ function renderMonthCalendar() {
     
     let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
     
+    // Bulan Lalu
     for(let i = firstDay - 1; i >= 0; i--) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(-1)"><span class="day-number">${prevDays - i}</span></div>`; }
+    
+    // Bulan Ini
     for(let i = 1; i <= daysInMonth; i++) {
         let currentLoopDate = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`; let loopDayName = namaHari[new Date(year, month, i).getDay()];
-        let dayColors = []; let isSunday = loopDayName === 'Minggu';
-        let matkulsToday = savedMatkul.filter(m => m.hari === loopDayName); if(isSunday) matkulsToday = [];
+        
+        let dayColors = []; 
+        let isHoliday = liburNasional[currentLoopDate];
+        let isOffDay = (loopDayName === 'Minggu') || isHoliday;
+        
+        let matkulsToday = savedMatkul.filter(m => m.hari === loopDayName); 
+        if(isOffDay) matkulsToday = []; // Blokir matkul reguler di hari libur
+        
         matkulsToday = matkulsToday.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === currentLoopDate));
         let movedIn = overrides.filter(o => o.newDate === currentLoopDate);
         if(matkulsToday.length > 0 || movedIn.length > 0) dayColors.push('var(--color-kuliah)');
+        
         savedTasks.filter(t => t.date === currentLoopDate && t.status !== 'done').forEach(t => dayColors.push(t.color || 'var(--color-tugas)'));
         
         let uColors = [...new Set(dayColors)]; let pillStyle = '';
@@ -191,16 +219,24 @@ function renderMonthCalendar() {
             pillStyle = `background: ${gradient});`;
         }
         let pillHtml = uColors.length > 0 ? `<div class="event-pill-container"><div class="event-pill" style="${pillStyle}"></div></div>` : '';
-        let numClass = isSunday ? 'day-number sunday-red' : 'day-number';
+        let numClass = isOffDay ? 'day-number sunday-red' : 'day-number';
         grid.innerHTML += `<div class="day-cell" onclick="showDayDetails('${currentLoopDate}', '${loopDayName}')"><span class="${numClass}">${i}</span>${pillHtml}</div>`;
     }
+    
+    // Bulan Depan
     const totalCells = firstDay + daysInMonth; const nextDays = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
     for(let i = 1; i <= nextDays; i++) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(1)"><span class="day-number">${i}</span></div>`; }
 }
 
 function showDayDetails(dateStr, dayName) {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
-    let matkulsToday = savedMatkul.filter(m => m.hari === dayName); if(dayName === 'Minggu') matkulsToday = [];
+    
+    let isHoliday = liburNasional[dateStr];
+    let isOffDay = (dayName === 'Minggu') || isHoliday;
+
+    let matkulsToday = savedMatkul.filter(m => m.hari === dayName); 
+    if(isOffDay) matkulsToday = []; 
+    
     matkulsToday = matkulsToday.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === dateStr));
     let movedIn = overrides.filter(o => o.newDate === dateStr).map(o => { let orig = savedMatkul.find(m => m.id === o.matkulId); return orig ? { ...orig, ...o, isOverride: true } : null; }).filter(x => x);
     let finalMatkuls = [...matkulsToday, ...movedIn]; let listHtml = '';
@@ -219,8 +255,12 @@ function showDayDetails(dateStr, dayName) {
             </div>`;
     });
     
-    if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal kuliah.</p>';
-    document.getElementById('detail-date-title').innerText = `Kuliah: ${dateStr}`; document.getElementById('detail-list').innerHTML = listHtml; document.getElementById('day-detail-modal').style.display = 'flex';
+    if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal.</p>';
+    
+    let holidayText = isHoliday ? ` - ${isHoliday}` : '';
+    document.getElementById('detail-date-title').innerText = `${dateStr}${holidayText}`; 
+    document.getElementById('detail-list').innerHTML = listHtml; 
+    document.getElementById('day-detail-modal').style.display = 'flex';
 }
 
 function openRescheduleModal(matkulId, origDate, activeDate) {
