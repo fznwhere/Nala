@@ -8,14 +8,16 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="calendar-header">
-            <button onclick="changeMonth(-1)">&#10094;</button>
-            <div style="position: relative; cursor: pointer;">
+        
+        <!-- Header Kalender Terkunci di Tengah -->
+        <div class="calendar-header" style="position: relative; display: flex; justify-content: center; align-items: center; height: 60px; margin-bottom: 20px;">
+            <button onclick="changeMonth(-1)" style="position: absolute; left: 0;">&#10094;</button>
+            <div style="position: relative; cursor: pointer; text-align: center;">
                 <h1 class="brand-title">Pola<span class="brand-dot">.</span></h1>
-                <p id="month-display-text" style="text-align: center; color: var(--text-muted); font-size: 14px; font-weight: bold;"></p>
-                <input type="month" id="native-month-picker" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0;">
+                <p id="month-display-text" style="color: var(--text-muted); font-size: 13px; font-weight: bold;"></p>
+                <input type="month" id="native-month-picker" style="position: absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor: pointer;">
             </div>
-            <button onclick="changeMonth(1)">&#10095;</button>
+            <button onclick="changeMonth(1)" style="position: absolute; right: 0;">&#10095;</button>
         </div>
 
         <div class="calendar-grid" id="calendar-grid"></div>
@@ -30,6 +32,7 @@
             <div class="history-tabs">
                 <button class="tab-btn active" id="tab-tk" onclick="renderHistory('Tugas Kuliah')">Tugas Kuliah</button>
                 <button class="tab-btn" id="tab-tb" onclick="renderHistory('Tugas')">Tugas</button>
+                <button class="tab-btn" id="tab-semua" onclick="renderHistory('Semua')">Semua Data</button>
             </div>
             <div id="history-list"></div>
         </div>
@@ -68,7 +71,6 @@
         </div>
     </div>
 
-    <!-- Modal Form (Dipakai bareng) -->
     <div class="modal-overlay" id="insert-modal">
         <div class="modal">
             <h2 id="modal-title">Tambah</h2>
@@ -82,6 +84,7 @@
                 <label>Tanggal *</label><input type="date" id="new-task-date">
                 <label>Jam *</label><input type="time" id="new-task-time">
                 <label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea>
+                <div id="field-warna" style="display: none;"><label>Warna Penanda</label><input type="color" id="new-task-color"></div>
             </form>
             <div class="modal-btns">
                 <button onclick="closeModal('insert-modal')" class="btn-cancel">Batal</button>
