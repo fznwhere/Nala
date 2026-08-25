@@ -130,8 +130,10 @@
                 <div id="field-tanggal"><label>Tanggal Mulai *</label><input type="date" id="new-task-date"></div>
                 <div id="field-tanggal-selesai" style="display: none;"><label>Tanggal Selesai (Opsional)</label><input type="date" id="new-task-date-end"></div>
                 
-                <div id="field-jam"><label>Jam Mulai *</label><input type="time" id="new-task-time"></div>
-                <div id="field-jam-selesai" style="display:none;"><label>Jam Selesai</label><input type="time" id="new-task-time-end"></div>
+                <div style="display: flex; gap: 10px;">
+                    <div id="field-jam" style="width: 100%;"><label>Jam Mulai *</label><input type="time" id="new-task-time"></div>
+                    <div id="field-jam-selesai" style="display:none; width: 100%;"><label>Jam Selesai</label><input type="time" id="new-task-time-end"></div>
+                </div>
                 
                 <div id="field-desc"><label>Deskripsi (Opsional)</label><textarea id="new-task-desc" rows="2"></textarea></div>
                 
