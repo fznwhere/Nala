@@ -25,6 +25,15 @@ function formatShortDate(dateStr) {
     if(parts.length !== 3) return dateStr; return `${parts[2]}-${parts[1]}-${parts[0].substring(2)}`;
 }
 
+// --- LOGIKA SWATCH WARNA ---
+function updateSwatchSelection(colorVal) {
+    if(!document.getElementById('new-task-color')) return;
+    document.getElementById('new-task-color').value = colorVal;
+    document.querySelectorAll('.swatch').forEach(s => {
+        s.classList.toggle('selected', s.dataset.color.toUpperCase() === colorVal.toUpperCase());
+    });
+}
+
 function toggleTaskDone(id) {
     let tasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let idx = tasks.findIndex(t => t.id == id);
     if(idx !== -1) { tasks[idx].status = tasks[idx].status === 'done' ? 'pending' : 'done'; localStorage.setItem('nalaTasks', JSON.stringify(tasks)); refreshAllViews(); }
@@ -313,8 +322,7 @@ function showDayDetails(dateStr, dayName) {
             </div>`;
     });
     
-    if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal kuliah.</p>';
-    
+    if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal.</p>';
     let holidayText = isHoliday ? ` - ${isHoliday}` : '';
     document.getElementById('detail-date-title').innerText = `${formatShortDate(dateStr)}${holidayText}`; 
     document.getElementById('detail-list').innerHTML = listHtml; document.getElementById('day-detail-modal').style.display = 'flex';
@@ -336,6 +344,7 @@ function saveReschedule() {
     localStorage.setItem('nalaOverrides', JSON.stringify(overrides)); closeModal('reschedule-modal'); renderMonthCalendar();
 }
 
+// --- MODAL TAMBAH TUGAS/ACARA/RUTIN ---
 function openModal(category) {
     editId = null; document.getElementById('modal-title').innerText = `Tambah ${category}`; document.getElementById('insert-form').reset();
     if(document.getElementById('field-matkul-dropdown')) document.getElementById('field-matkul-dropdown').style.display = (category === 'Tugas Kuliah') ? 'block' : 'none';
@@ -344,10 +353,7 @@ function openModal(category) {
     if(document.getElementById('field-rutinitas-hari')) document.getElementById('field-rutinitas-hari').style.display = (category === 'Rutinitas') ? 'block' : 'none';
     
     document.getElementById('current-category').value = category;
-    
-    if(document.getElementById('new-task-color')) {
-        document.getElementById('new-task-color').value = category === 'Rutinitas' ? '#C08552' : '#6B705C'; // Default Earth tones
-    }
+    if(document.getElementById('new-task-color')) updateSwatchSelection(category === 'Rutinitas' ? '#8C6239' : '#3E5A47');
     
     if(category === 'Tugas Kuliah') {
         const sel = document.getElementById('task-matkul-select'); sel.innerHTML = '<option value="">-- Pilih Kuliah --</option>';
@@ -362,7 +368,7 @@ function openEditTask(id, category) {
     if(task) {
         document.getElementById('new-task-name').value = task.name; document.getElementById('new-task-date').value = task.date;
         document.getElementById('new-task-time').value = task.time; document.getElementById('new-task-desc').value = task.deskripsi || '';
-        if(category === 'Acara' && document.getElementById('new-task-color')) document.getElementById('new-task-color').value = task.color;
+        if(category === 'Acara' && document.getElementById('new-task-color')) updateSwatchSelection(task.color);
         if(category === 'Tugas Kuliah') { document.getElementById('task-matkul-select').value = task.matkulId; document.getElementById('task-via').value = task.pengumpulan; }
     }
 }
@@ -372,7 +378,7 @@ function openEditRoutine(id) {
     let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || []; let routine = savedRoutines.find(r => r.id == id);
     if(routine) {
         document.getElementById('new-task-name').value = routine.name; document.getElementById('new-task-time').value = routine.time;
-        if(document.getElementById('new-task-color')) document.getElementById('new-task-color').value = routine.color;
+        if(document.getElementById('new-task-color')) updateSwatchSelection(routine.color);
         document.querySelectorAll('input[name="routine-days"]').forEach(cb => { cb.checked = routine.days.includes(cb.value); });
     }
 }
@@ -446,4 +452,14 @@ function deleteMatkul(id) {
     localStorage.setItem('nalaMatkul', JSON.stringify(savedMatkul)); renderMatkulList();
 }
 
-document.addEventListener("DOMContentLoaded", () => { document.querySelectorAll('.fab').forEach(f => f.innerHTML = iPls); });
+// Injeksi Ikon Plus Secara Otomatis
+document.addEventListener("DOMContentLoaded", () => { 
+    document.querySelectorAll('.fab').forEach(f => f.innerHTML = iPls);
+    // Setup listener untuk swatches
+    document.querySelectorAll('.swatch').forEach(sw => {
+        sw.addEventListener('click', function(e) {
+            e.stopPropagation();
+            updateSwatchSelection(this.dataset.color);
+        });
+    });
+});
