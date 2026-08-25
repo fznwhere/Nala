@@ -25,13 +25,10 @@ function formatShortDate(dateStr) {
     if(parts.length !== 3) return dateStr; return `${parts[2]}-${parts[1]}-${parts[0].substring(2)}`;
 }
 
-// --- LOGIKA SWATCH WARNA ---
 function updateSwatchSelection(colorVal) {
     if(!document.getElementById('new-task-color')) return;
     document.getElementById('new-task-color').value = colorVal;
-    document.querySelectorAll('.swatch').forEach(s => {
-        s.classList.toggle('selected', s.dataset.color.toUpperCase() === colorVal.toUpperCase());
-    });
+    document.querySelectorAll('.swatch').forEach(s => { s.classList.toggle('selected', s.dataset.color.toUpperCase() === colorVal.toUpperCase()); });
 }
 
 function toggleTaskDone(id) {
@@ -77,22 +74,23 @@ async function loadTodaySchedule() {
     todaysMatkul = todaysMatkul.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === todayStr));
     let movedIn = overrides.filter(o => o.newDate === todayStr).map(o => { let orig = savedMatkul.find(m => m.id === o.matkulId); return orig ? { ...orig, ...o, isOverride: true } : null; }).filter(x => x);
     [...todaysMatkul, ...movedIn].forEach(m => {
-        combinedSchedule.push({ type: 'kuliah', id: m.id, name: `Kuliah: ${m.name}`, time: m.isOverride ? m.newTime : m.jamMulai, endTime: m.jamSelesai || '', color: 'var(--color-kuliah)', ruang: m.isOverride ? m.newRuangan : m.ruangan, dosen: m.isOverride ? m.newDosen : m.dosen });
+        combinedSchedule.push({ type: 'kuliah', id: m.id, name: `${m.name}`, badge: 'Kuliah', time: m.isOverride ? m.newTime : m.jamMulai, endTime: m.jamSelesai || '', color: 'var(--color-kuliah)', ruang: m.isOverride ? m.newRuangan : m.ruangan, dosen: m.isOverride ? m.newDosen : m.dosen });
     });
 
     savedTasks.filter(t => t.date === todayStr).forEach(t => {
-        combinedSchedule.push({ type: t.category.toLowerCase().includes('tugas') ? 'tugas' : 'acara', id: t.id, name: t.name, time: t.time, endTime: '', color: t.color || 'var(--color-acara)', desc: t.deskripsi || 'Tidak ada catatan.', via: t.pengumpulan, cat: t.category, status: t.status });
+        let tCat = t.category.toLowerCase().includes('tugas') ? 'Tugas' : 'Acara';
+        combinedSchedule.push({ type: tCat.toLowerCase(), id: t.id, name: t.name, badge: tCat, time: t.time, endTime: '', color: t.color || 'var(--color-acara)', desc: t.deskripsi || 'Tidak ada catatan.', via: t.pengumpulan, cat: t.category, status: t.status });
     });
     savedRoutines.filter(r => r.days.includes(todayDayName)).forEach(r => {
-        combinedSchedule.push({ type: 'rutin', id: r.id, name: r.name, time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: 'Jadwal Rutinitas Mingguan' });
+        combinedSchedule.push({ type: 'rutin', id: r.id, name: r.name, badge: 'Rutinitas', time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: 'Jadwal Rutinitas Mingguan' });
     });
 
     const salatNames = ['Subuh', 'Zuhur', 'Asar', 'Maghrib', 'Isya'];
     try {
         const t = (await (await fetch('https://api.aladhan.com/v1/timingsByCity?city=Yogyakarta&country=Indonesia&method=11')).json()).data.timings;
-        ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((w, i) => { combinedSchedule.push({ type: 'salat', id: salatNames[i], name: salatNames[i], time: t[w], endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat' }); });
+        ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((w, i) => { combinedSchedule.push({ type: 'salat', id: salatNames[i], name: salatNames[i], badge: '', time: t[w], endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat' }); });
     } catch (e) {
-        ['04:30', '11:45', '15:00', '17:45', '19:00'].forEach((w, i) => { combinedSchedule.push({ type: 'salat', id: salatNames[i], name: `${salatNames[i]} (Offline)`, time: w, endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat (Offline)' }); });
+        ['04:30', '11:45', '15:00', '17:45', '19:00'].forEach((w, i) => { combinedSchedule.push({ type: 'salat', id: salatNames[i], name: `${salatNames[i]}`, badge: '', time: w, endTime: '', color: 'var(--color-salat)', desc: 'Waktu Salat (Offline)' }); });
     }
 
     combinedSchedule.sort((a, b) => a.time.localeCompare(b.time));
@@ -120,14 +118,18 @@ async function loadTodaySchedule() {
             </div>`;
         } else { detailHtml = `<p>${item.desc}</p>`; }
 
+        let badgeHtml = item.badge ? `<span class="tag-pill">${item.badge}</span>` : '';
+
         list.innerHTML += `
             <div class="card" onclick="toggleDetail(this)" style="${cardOpacity}">
                 <div class="card-header" style="background-color: ${item.color};">
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="card-header-content">
                         <button class="check-btn" onclick="event.stopPropagation(); toggleDismiss('${item.type}', '${item.id}', '${todayStr}')">${btnIcon}</button>
-                        <h3 style="font-size:15px; ${titleStyle}">${item.name}</h3>
+                        <div>
+                            <h3 style="${titleStyle}">${item.name} ${badgeHtml}</h3>
+                            <small class="time-badge" style="${titleStyle}">${iClk} ${item.time} ${item.endTime ? '- '+item.endTime : ''}</small>
+                        </div>
                     </div>
-                    <span class="time-badge" style="${titleStyle}">${iClk} ${item.time} ${item.endTime ? '- '+item.endTime : ''}</span>
                 </div>
                 <div class="card-detail">${detailHtml}</div>
             </div>`;
@@ -160,9 +162,12 @@ function renderUpcomingTasks() {
         list.innerHTML += `
             <div class="card" onclick="toggleDetail(this)">
                 <div class="card-header" style="background-color: ${t.color || 'var(--color-tugas)'};">
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="card-header-content">
                         <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iCir}</button>
-                        <div><h3 style="margin-bottom: 2px;">${t.name}</h3><small style="opacity:0.9;">${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small></div>
+                        <div>
+                            <h3>${t.name}</h3>
+                            <small>${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small>
+                        </div>
                     </div>
                     <span class="${badgeClass}">${badgeText}</span>
                 </div>
@@ -195,7 +200,12 @@ function renderHistory(tabName) {
             allDataHtml += `
                 <div class="card history-card" onclick="toggleDetail(this)">
                     <div class="card-header" style="background-color: ${t.color || 'var(--color-acara)'}; opacity:0.9;">
-                        <div><h3 style="color:#FFFFFF;">[Acara] ${t.name}</h3><small style="opacity:0.9; color:var(--state-dimmed);">${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small></div>
+                        <div class="card-header-content">
+                            <div>
+                                <h3 style="color:#FFFFFF;">${t.name} <span class="tag-pill">Acara</span></h3>
+                                <small style="color:var(--state-dimmed);">${iDat} ${formatShortDate(t.date)} &nbsp; ${iClk} ${t.time}</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-detail">
                         <p>${t.deskripsi || 'Tidak ada deskripsi'}</p>
@@ -211,7 +221,12 @@ function renderHistory(tabName) {
             allDataHtml += `
                 <div class="card history-card" onclick="toggleDetail(this)">
                     <div class="card-header" style="background-color: ${r.color || 'var(--color-rutin)'}; opacity:0.9;">
-                        <div><h3 style="color:#FFFFFF;">[Rutinitas] ${r.name}</h3><small style="opacity:0.9; color:var(--state-dimmed);">${iClk} ${r.time} | Setiap: ${r.days.join(', ')}</small></div>
+                        <div class="card-header-content">
+                            <div>
+                                <h3 style="color:#FFFFFF;">${r.name} <span class="tag-pill">Rutinitas</span></h3>
+                                <small style="color:var(--state-dimmed);">${iClk} ${r.time} | Setiap: ${r.days.join(', ')}</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-detail">
                         <p>Rutinitas Mingguan</p>
@@ -235,9 +250,12 @@ function renderHistory(tabName) {
         list.innerHTML += `
             <div class="card history-card" onclick="toggleDetail(this)">
                 <div class="card-header" style="background-color: ${t.color || 'var(--color-tugas)'}; opacity:0.8;">
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="card-header-content">
                         <button class="check-btn" onclick="event.stopPropagation(); toggleTaskDone('${t.id}')">${iChkCir}</button>
-                        <div><h3 style="text-decoration:line-through; color: var(--state-dimmed);">${t.name}</h3><small style="opacity:0.9; color: var(--state-dimmed);">${iDat} ${formatShortDate(t.date)}</small></div>
+                        <div>
+                            <h3 style="text-decoration:line-through; color: var(--state-dimmed);">${t.name}</h3>
+                            <small style="color: var(--state-dimmed);">${iDat} ${formatShortDate(t.date)}</small>
+                        </div>
                     </div>
                 </div>
                 <div class="card-detail">
@@ -313,7 +331,12 @@ function showDayDetails(dateStr, dayName) {
         listHtml += `
             <div class="card" onclick="toggleDetail(this)" style="margin-bottom:10px;">
                 <div class="card-header" style="background-color: var(--color-kuliah); padding:12px 16px;">
-                    <h3 style="font-size:14px;">${m.name}</h3><span class="time-badge">${time} ${end ? '- '+end : ''}</span>
+                    <div class="card-header-content">
+                        <div>
+                            <h3 style="font-size:14px;">${m.name}</h3>
+                            <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-detail" style="padding:12px 16px;">
                     <div class="detail-grid"><div class="detail-item">${iRom} <div><span>Ruangan</span>${ruang}</div></div><div class="detail-item">${iUsr} <div><span>Dosen</span>${dosen}</div></div></div>
@@ -323,7 +346,9 @@ function showDayDetails(dateStr, dayName) {
     });
     
     if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal.</p>';
-    let holidayText = isHoliday ? ` - ${isHoliday}` : '';
+    
+    // Perubahan Format Judul Pop Up (Spasi Saja)
+    let holidayText = isHoliday ? ` ${isHoliday}` : '';
     document.getElementById('detail-date-title').innerText = `${formatShortDate(dateStr)}${holidayText}`; 
     document.getElementById('detail-list').innerHTML = listHtml; document.getElementById('day-detail-modal').style.display = 'flex';
 }
@@ -344,7 +369,6 @@ function saveReschedule() {
     localStorage.setItem('nalaOverrides', JSON.stringify(overrides)); closeModal('reschedule-modal'); renderMonthCalendar();
 }
 
-// --- MODAL TAMBAH TUGAS/ACARA/RUTIN ---
 function openModal(category) {
     editId = null; document.getElementById('modal-title').innerText = `Tambah ${category}`; document.getElementById('insert-form').reset();
     if(document.getElementById('field-matkul-dropdown')) document.getElementById('field-matkul-dropdown').style.display = (category === 'Tugas Kuliah') ? 'block' : 'none';
@@ -406,7 +430,6 @@ function saveNewTask() {
     closeModal('insert-modal'); refreshAllViews();
 }
 
-// --- KULIAH PAGE ---
 if(document.getElementById('matkul-list')) renderMatkulList();
 function openMatkulModal() { editId = null; document.getElementById('matkul-form').reset(); document.getElementById('matkul-modal').style.display = 'flex'; }
 
@@ -426,7 +449,12 @@ function renderMatkulList() {
         list.innerHTML += `
             <div class="card" onclick="toggleDetail(this)">
                 <div class="card-header" style="background-color: var(--color-kuliah);">
-                    <h3>${m.name}</h3><span class="time-badge">${m.hari}</span>
+                    <div class="card-header-content">
+                        <div>
+                            <h3>${m.name}</h3>
+                            <small class="time-badge">${m.hari}</small>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-detail">
                     <div class="detail-grid">
@@ -452,14 +480,7 @@ function deleteMatkul(id) {
     localStorage.setItem('nalaMatkul', JSON.stringify(savedMatkul)); renderMatkulList();
 }
 
-// Injeksi Ikon Plus Secara Otomatis
 document.addEventListener("DOMContentLoaded", () => { 
     document.querySelectorAll('.fab').forEach(f => f.innerHTML = iPls);
-    // Setup listener untuk swatches
-    document.querySelectorAll('.swatch').forEach(sw => {
-        sw.addEventListener('click', function(e) {
-            e.stopPropagation();
-            updateSwatchSelection(this.dataset.color);
-        });
-    });
+    document.querySelectorAll('.swatch').forEach(sw => { sw.addEventListener('click', function(e) { e.stopPropagation(); updateSwatchSelection(this.dataset.color); }); });
 });
