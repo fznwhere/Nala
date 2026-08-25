@@ -106,7 +106,7 @@ async function loadTodaySchedule() {
         combinedSchedule.push({ type: tCat.toLowerCase(), id: t.id, name: t.name, badge: tCat, time: t.time, endTime: '', color: t.color || 'var(--color-acara)', desc: t.deskripsi || 'Tidak ada catatan.', via: t.pengumpulan, cat: t.category, status: t.status });
     });
     savedRoutines.filter(r => r.days.includes(todayDayName)).forEach(r => {
-        combinedSchedule.push({ type: 'rutin', id: r.id, name: r.name, badge: 'Rutinitas', time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: 'Jadwal Rutinitas Mingguan' });
+        combinedSchedule.push({ type: 'rutin', id: r.id, name: r.name, badge: 'Rutinitas', time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: r.desc || 'Jadwal Rutinitas Mingguan' });
     });
 
     const salatNames = ['Subuh', 'Zuhur', 'Asar', 'Maghrib', 'Isya'];
@@ -163,6 +163,7 @@ async function loadTodaySchedule() {
     });
 }
 
+// --- KALENDER (TUGAS MENDATANG & RIWAYAT) ---
 if(document.getElementById('calendar-grid')) {
     renderMonthCalendar(); renderHistory('Tugas Kuliah'); renderUpcomingTasks();
     let tabsContainer = document.querySelector('.history-tabs');
@@ -265,7 +266,7 @@ function renderHistory(tabName) {
                         </div>
                     </div>
                     <div class="card-detail">
-                        <p>Rutinitas Mingguan</p>
+                        <p>${r.desc || 'Rutinitas Mingguan'}</p>
                         <div class="card-actions three-btns">
                             <button class="icon-btn delete" onclick="event.stopPropagation(); deleteRoutine(${r.id})">${iDel} Hapus</button>
                             <div><button class="icon-btn" onclick="event.stopPropagation(); openEditRoutine(${r.id})">${iEdt} Edit</button></div>
@@ -379,38 +380,78 @@ function renderMonthCalendar() {
 }
 
 function showDayDetails(dateStr, dayName) {
-    let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
-    let isHoliday = liburNasional[dateStr] || isUserHoliday(dateStr); let isOffDay = (dayName === 'Minggu') || isHoliday;
+    let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; 
+    let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
+    let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || [];
+    let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
+    
+    let isHoliday = liburNasional[dateStr] || isUserHoliday(dateStr); 
+    let isOffDay = (dayName === 'Minggu') || isHoliday;
+    
+    let popUpItems = [];
 
+    // 1. Ambil Jadwal Kuliah Reguler & Override
     let matkulsToday = savedMatkul.filter(m => m.hari === dayName); 
     if(isOffDay) matkulsToday = []; 
-    
     matkulsToday = matkulsToday.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === dateStr));
     let movedIn = overrides.filter(o => o.newDate === dateStr).map(o => { let orig = savedMatkul.find(m => m.id === o.matkulId); return orig ? { ...orig, ...o, isOverride: true } : null; }).filter(x => x);
-    let finalMatkuls = [...matkulsToday, ...movedIn]; let listHtml = '';
     
-    finalMatkuls.forEach(m => {
-        let time = m.isOverride ? m.newTime : m.jamMulai; let end = m.isOverride && m.newEndTime !== undefined ? m.newEndTime : (m.jamSelesai || ''); let ruang = m.isOverride ? m.newRuangan : m.ruangan; let dosen = m.isOverride ? m.newDosen : m.dosen; let origDate = m.isOverride ? m.originalDate : dateStr;
+    [...matkulsToday, ...movedIn].forEach(m => {
+        let time = m.isOverride ? m.newTime : m.jamMulai; 
+        let end = m.isOverride && m.newEndTime !== undefined ? m.newEndTime : (m.jamSelesai || ''); 
+        let ruang = m.isOverride ? m.newRuangan : m.ruangan; 
+        let dosen = m.isOverride ? m.newDosen : m.dosen; 
+        let origDate = m.isOverride ? m.originalDate : dateStr;
+        popUpItems.push({ type: 'kuliah', id: m.id, name: m.name, badge: 'Kuliah', time: time, endTime: end, color: 'var(--color-kuliah)', ruang: ruang, dosen: dosen, origDate: origDate });
+    });
+
+    // 2. Ambil Tugas & Acara
+    savedTasks.filter(t => t.date === dateStr).forEach(t => {
+        let tCat = t.category.toLowerCase().includes('tugas') ? 'Tugas' : 'Acara';
+        popUpItems.push({ type: 'tugasAcara', id: t.id, name: t.name, badge: tCat, time: t.time, endTime: '', color: t.color || 'var(--color-tugas)', desc: t.deskripsi, via: t.pengumpulan });
+    });
+
+    // 3. Ambil Rutinitas
+    savedRoutines.filter(r => r.days.includes(dayName)).forEach(r => {
+        popUpItems.push({ type: 'rutin', id: r.id, name: r.name, badge: 'Rutinitas', time: r.time, endTime: '', color: r.color || 'var(--color-rutin)', desc: r.desc || 'Jadwal Rutinitas Mingguan' });
+    });
+
+    // Urutkan berdasarkan jam
+    popUpItems.sort((a, b) => a.time.localeCompare(b.time));
+
+    // Render ke HTML
+    let listHtml = '';
+    popUpItems.forEach(item => {
+        let detailHtml = '';
+        if (item.type === 'kuliah') {
+            detailHtml = `
+                <div class="detail-grid"><div class="detail-item">${iRom} <div><span>Ruangan</span>${item.ruang}</div></div><div class="detail-item">${iUsr} <div><span>Dosen</span>${item.dosen}</div></div></div>
+                <div class="card-actions"><button class="icon-btn" onclick="event.stopPropagation(); openRescheduleModal(${item.id}, '${item.origDate}', '${dateStr}')">${iEdt} Pindah Jadwal</button></div>`;
+        } else if (item.type === 'tugasAcara') {
+            detailHtml = `<p style="line-height:1.5;">${item.desc || 'Tidak ada deskripsi'}</p>${item.via ? `<div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--border-line);"><span>Via/Kumpul:</span> <strong>${item.via}</strong></div>` : ''}`;
+        } else {
+            detailHtml = `<p style="line-height:1.5;">${item.desc}</p>`;
+        }
+
         listHtml += `
             <div class="card" onclick="toggleDetail(this)" style="margin-bottom:10px;">
-                <div class="card-header" style="background-color: var(--color-kuliah); padding:12px 16px;">
+                <div class="card-header" style="background-color: ${item.color}; padding:12px 16px;">
                     <div class="card-header-top">
                         <div class="card-title-group">
                             <div>
-                                <h3 style="font-size:14px;">${m.name}</h3>
-                                <small class="time-badge">${time} ${end ? '- '+end : ''}</small>
+                                <h3 style="font-size:14px;">${item.name}</h3>
+                                <small class="time-badge">${item.time} ${item.endTime ? '- '+item.endTime : ''}</small>
                             </div>
                         </div>
+                        <span class="tag-pill">${item.badge}</span>
                     </div>
                 </div>
-                <div class="card-detail" style="padding:12px 16px;">
-                    <div class="detail-grid"><div class="detail-item">${iRom} <div><span>Ruangan</span>${ruang}</div></div><div class="detail-item">${iUsr} <div><span>Dosen</span>${dosen}</div></div></div>
-                    <div class="card-actions"><button class="icon-btn" onclick="event.stopPropagation(); openRescheduleModal(${m.id}, '${origDate}', '${dateStr}')">${iEdt} Pindah Jadwal</button></div>
-                </div>
+                <div class="card-detail" style="padding:12px 16px;">${detailHtml}</div>
             </div>`;
     });
     
     if(!listHtml) listHtml = '<p style="color:var(--text-muted); font-size:14px; text-align:center;">Tidak ada jadwal.</p>';
+    
     let holidayText = isHoliday ? ` ${isHoliday}` : '';
     document.getElementById('detail-date-title').innerText = `${formatShortDate(dateStr)}${holidayText}`; 
     document.getElementById('detail-list').innerHTML = listHtml; document.getElementById('day-detail-modal').style.display = 'flex';
@@ -457,8 +498,6 @@ function openModal(category) {
     if(category === 'Tugas Kuliah' || category === 'Kuliah') {
         const sel = document.getElementById('task-matkul-select'); sel.innerHTML = '<option value="">-- Pilih Kuliah --</option>';
         let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; 
-        
-        // Mencegah duplikasi nama matkul di dropdown jika user memasukkan matkul yang sama di hari berbeda
         let uniqueMatkul = [];
         savedMatkul.forEach(m => {
             if(!uniqueMatkul.includes(m.name)) { uniqueMatkul.push(m.name); sel.innerHTML += `<option value="${m.name}">${m.name}</option>`; }
@@ -483,6 +522,7 @@ function openEditRoutine(id) {
     let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || []; let routine = savedRoutines.find(r => r.id == id);
     if(routine) {
         document.getElementById('new-task-name').value = routine.name; document.getElementById('new-task-time').value = routine.time;
+        if(document.getElementById('new-task-desc')) document.getElementById('new-task-desc').value = routine.desc || '';
         if(document.getElementById('new-task-color')) updateSwatchSelection(routine.color);
         document.querySelectorAll('input[name="routine-days"]').forEach(cb => { cb.checked = routine.days.includes(cb.value); });
     }
@@ -511,14 +551,14 @@ function saveNewTask() {
     } 
     else if(category === 'Rutinitas') {
         const time = document.getElementById('new-task-time').value;
+        const descInput = document.getElementById('new-task-desc'); const desc = descInput ? descInput.value : '';
         let selectedDays = []; document.querySelectorAll('input[name="routine-days"]:checked').forEach(cb => selectedDays.push(cb.value));
         if(!name || !time || selectedDays.length === 0) return alert("Nama, jam, dan hari wajib diisi!");
-        let routineData = { id: editId ? editId : Date.now(), name: name, time: time, days: selectedDays, color: document.getElementById('new-task-color').value };
+        let routineData = { id: editId ? editId : Date.now(), name: name, time: time, days: selectedDays, color: document.getElementById('new-task-color').value, desc: desc };
         let savedRoutines = JSON.parse(localStorage.getItem('nalaRoutines')) || [];
         if(editId) { const idx = savedRoutines.findIndex(r => r.id == editId); if(idx !== -1) savedRoutines[idx] = routineData; } else { savedRoutines.push(routineData); }
         localStorage.setItem('nalaRoutines', JSON.stringify(savedRoutines));
     }
-    // PERBAIKAN BUG KULIAH 1 HARI (Pencarian Berdasarkan Nama Matkul)
     else if(category === 'Kuliah') {
         const matkulName = document.getElementById('task-matkul-select').value; const date = document.getElementById('new-task-date').value; const time = document.getElementById('new-task-time').value;
         const endTime = document.getElementById('new-task-time-end').value; const ruang = document.getElementById('new-task-ruang').value;
