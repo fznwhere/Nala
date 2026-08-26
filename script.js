@@ -633,5 +633,31 @@ function deleteMatkul(id) {
 
 document.addEventListener("DOMContentLoaded", () => { 
     document.querySelectorAll('.fab').forEach(f => f.innerHTML = iPls);
-    document.querySelectorAll('.swatch').forEach(sw => { sw.addEventListener('click', function(e) { e.stopPropagation(); updateSwatchSelection(this.dataset.color); }); });
+    document.querySelectorAll('.swatch').forEach(sw => { 
+        sw.addEventListener('click', function(e) { 
+            e.stopPropagation(); updateSwatchSelection(this.dataset.color); 
+        }); 
+    });
+
+    // --- LOGIKA ANIMASI INTRO ---
+    const introScreen = document.getElementById('intro-screen');
+    if (introScreen) {
+        // Cek apakah intro sudah dimainkan di sesi ini
+        if (!sessionStorage.getItem('introPlayed')) {
+            const introVid = document.getElementById('intro-video');
+            
+            const hideIntro = () => { 
+                introScreen.classList.add('intro-hidden'); 
+                sessionStorage.setItem('introPlayed', 'true'); 
+                setTimeout(() => { introScreen.style.display = 'none'; }, 500);
+            };
+            
+            // Hilang otomatis setelah video habis ATAU maksimal 2.5 detik (sebagai cadangan)
+            if(introVid) introVid.onended = hideIntro;
+            setTimeout(hideIntro, 2500); 
+        } else {
+            // Jika sudah pernah diputar, sembunyikan secara instan
+            introScreen.style.display = 'none';
+        }
+    }
 });
