@@ -165,16 +165,58 @@ async function loadTodaySchedule() {
 
 // --- KALENDER (TUGAS MENDATANG & RIWAYAT) ---
 if(document.getElementById('calendar-grid')) {
-    renderMonthCalendar(); renderHistory('Tugas Kuliah'); renderUpcomingTasks();
-    let tabsContainer = document.querySelector('.history-tabs');
-    if(tabsContainer && !document.getElementById('tab-semua')) { tabsContainer.innerHTML += `<button class="tab-btn" id="tab-semua" onclick="renderHistory('Semua')">Semua Data</button>`; }
-    if(document.getElementById('native-month-picker')) {
-        document.getElementById('native-month-picker').addEventListener('change', function(e) {
-            if(e.target.value) { const p = e.target.value.split('-'); currentNavDate.setFullYear(parseInt(p[0]), parseInt(p[1]) - 1); renderMonthCalendar(); }
-        });
+    function renderMonthCalendar() {
+    const grid = document.getElementById('calendar-grid'); if(!grid) return; grid.innerHTML = '';
+    const year = currentNavDate.getFullYear(); const month = currentNavDate.getMonth();
+    
+    // --- TAMBAHAN UNTUK HARI INI ---
+    const realToday = new Date();
+    const realTodayStr = `${realToday.getFullYear()}-${String(realToday.getMonth()+1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
+    
+    if(document.getElementById('month-display-text')) document.getElementById('month-display-text').innerText = currentNavDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+    if(document.getElementById('native-month-picker')) document.getElementById('native-month-picker').value = `${year}-${String(month+1).padStart(2, '0')}`;
+    
+    ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].forEach(d => { grid.innerHTML += `<div class="day-name">${d}</div>`; });
+    const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+    
+    let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
+    
+    for(let i = firstDay - 1; i >= 0; i--) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(-1)"><span class="day-number">${prevDays - i}</span></div>`; }
+    for(let i = 1; i <= daysInMonth; i++) {
+        let currentLoopDate = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`; let loopDayName = namaHari[new Date(year, month, i).getDay()];
+        
+        let dayColors = []; 
+        let isHoliday = liburNasional[currentLoopDate] || isUserHoliday(currentLoopDate);
+        let isOffDay = (loopDayName === 'Minggu') || isHoliday;
+        
+        let matkulsToday = savedMatkul.filter(m => m.hari === loopDayName); 
+        if(isOffDay) matkulsToday = []; 
+        
+        matkulsToday = matkulsToday.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === currentLoopDate));
+        let movedIn = overrides.filter(o => o.newDate === currentLoopDate);
+        if(matkulsToday.length > 0 || movedIn.length > 0) dayColors.push('var(--color-kuliah)');
+        
+        savedTasks.filter(t => t.date === currentLoopDate && t.status !== 'done').forEach(t => dayColors.push(t.color || 'var(--color-tugas)'));
+        
+        let uColors = [...new Set(dayColors)]; let pillStyle = '';
+        if (uColors.length === 1) pillStyle = `background: ${uColors[0]};`;
+        else if (uColors.length > 1) {
+            let gradient = 'linear-gradient(to right, '; let step = 100 / uColors.length;
+            uColors.forEach((c, idx) => { gradient += `${c} ${idx * step}%, ${c} ${(idx + 1) * step}%${idx < uColors.length - 1 ? ', ' : ''}`; });
+            pillStyle = `background: ${gradient});`;
+        }
+        let pillHtml = uColors.length > 0 ? `<div class="event-pill-container"><div class="event-pill" style="${pillStyle}"></div></div>` : '';
+        let numClass = isOffDay ? 'day-number sunday-red' : 'day-number';
+        
+        // --- CEK APAKAH TANGGAL INI SAMA DENGAN HARI INI ---
+        let todayClass = (currentLoopDate === realTodayStr) ? ' today-highlight' : '';
+        
+        grid.innerHTML += `<div class="day-cell${todayClass}" onclick="showDayDetails('${currentLoopDate}', '${loopDayName}')"><span class="${numClass}">${i}</span>${pillHtml}</div>`;
     }
+    const totalCells = firstDay + daysInMonth; const nextDays = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
+    for(let i = 1; i <= nextDays; i++) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(1)"><span class="day-number">${i}</span></div>`; }
 }
-
 function renderUpcomingTasks() {
     const list = document.getElementById('upcoming-list'); if(!list) return; list.innerHTML = '';
     let pendingTasks = (JSON.parse(localStorage.getItem('nalaTasks')) || []).filter(t => t.status !== 'done' && (t.category === 'Tugas Kuliah' || t.category === 'Tugas'));
