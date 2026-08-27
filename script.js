@@ -79,7 +79,7 @@ function refreshAllViews() {
     if(document.getElementById('matkul-list')) renderMatkulList();
 }
 
-// --- BERANDA ---
+// --- BERANDA PENGATURAN ---
 if(document.getElementById('schedule-list')) loadTodaySchedule();
 
 async function loadTodaySchedule() {
@@ -163,13 +163,23 @@ async function loadTodaySchedule() {
     });
 }
 
-// --- KALENDER (TUGAS MENDATANG & RIWAYAT) ---
+// --- KALENDER PENGATURAN ---
 if(document.getElementById('calendar-grid')) {
-    function renderMonthCalendar() {
+    renderMonthCalendar(); renderHistory('Tugas Kuliah'); renderUpcomingTasks();
+    let tabsContainer = document.querySelector('.history-tabs');
+    if(tabsContainer && !document.getElementById('tab-semua')) { tabsContainer.innerHTML += `<button class="tab-btn" id="tab-semua" onclick="renderHistory('Semua')">Semua Data</button>`; }
+    if(document.getElementById('native-month-picker')) {
+        document.getElementById('native-month-picker').addEventListener('change', function(e) {
+            if(e.target.value) { const p = e.target.value.split('-'); currentNavDate.setFullYear(parseInt(p[0]), parseInt(p[1]) - 1); renderMonthCalendar(); }
+        });
+    }
+}
+
+// SEMUA FUNGSI GLOBAL DI BAWAH INI
+function renderMonthCalendar() {
     const grid = document.getElementById('calendar-grid'); if(!grid) return; grid.innerHTML = '';
     const year = currentNavDate.getFullYear(); const month = currentNavDate.getMonth();
     
-    // --- TAMBAHAN UNTUK HARI INI ---
     const realToday = new Date();
     const realTodayStr = `${realToday.getFullYear()}-${String(realToday.getMonth()+1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`;
     
@@ -209,14 +219,13 @@ if(document.getElementById('calendar-grid')) {
         let pillHtml = uColors.length > 0 ? `<div class="event-pill-container"><div class="event-pill" style="${pillStyle}"></div></div>` : '';
         let numClass = isOffDay ? 'day-number sunday-red' : 'day-number';
         
-        // --- CEK APAKAH TANGGAL INI SAMA DENGAN HARI INI ---
         let todayClass = (currentLoopDate === realTodayStr) ? ' today-highlight' : '';
-        
         grid.innerHTML += `<div class="day-cell${todayClass}" onclick="showDayDetails('${currentLoopDate}', '${loopDayName}')"><span class="${numClass}">${i}</span>${pillHtml}</div>`;
     }
     const totalCells = firstDay + daysInMonth; const nextDays = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
     for(let i = 1; i <= nextDays; i++) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(1)"><span class="day-number">${i}</span></div>`; }
 }
+
 function renderUpcomingTasks() {
     const list = document.getElementById('upcoming-list'); if(!list) return; list.innerHTML = '';
     let pendingTasks = (JSON.parse(localStorage.getItem('nalaTasks')) || []).filter(t => t.status !== 'done' && (t.category === 'Tugas Kuliah' || t.category === 'Tugas'));
@@ -377,50 +386,6 @@ function renderHistory(tabName) {
 
 function changeMonth(offset) { currentNavDate.setMonth(currentNavDate.getMonth() + offset); renderMonthCalendar(); }
 
-function renderMonthCalendar() {
-    const grid = document.getElementById('calendar-grid'); if(!grid) return; grid.innerHTML = '';
-    const year = currentNavDate.getFullYear(); const month = currentNavDate.getMonth();
-    if(document.getElementById('month-display-text')) document.getElementById('month-display-text').innerText = currentNavDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-    if(document.getElementById('native-month-picker')) document.getElementById('native-month-picker').value = `${year}-${String(month+1).padStart(2, '0')}`;
-    
-    ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'].forEach(d => { grid.innerHTML += `<div class="day-name">${d}</div>`; });
-    const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const prevDays = new Date(year, month, 0).getDate();
-    
-    let savedTasks = JSON.parse(localStorage.getItem('nalaTasks')) || []; let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
-    
-    for(let i = firstDay - 1; i >= 0; i--) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(-1)"><span class="day-number">${prevDays - i}</span></div>`; }
-    for(let i = 1; i <= daysInMonth; i++) {
-        let currentLoopDate = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`; let loopDayName = namaHari[new Date(year, month, i).getDay()];
-        
-        let dayColors = []; 
-        let isHoliday = liburNasional[currentLoopDate] || isUserHoliday(currentLoopDate);
-        let isOffDay = (loopDayName === 'Minggu') || isHoliday;
-        
-        let matkulsToday = savedMatkul.filter(m => m.hari === loopDayName); 
-        if(isOffDay) matkulsToday = []; 
-        
-        matkulsToday = matkulsToday.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === currentLoopDate));
-        let movedIn = overrides.filter(o => o.newDate === currentLoopDate);
-        if(matkulsToday.length > 0 || movedIn.length > 0) dayColors.push('var(--color-kuliah)');
-        
-        savedTasks.filter(t => t.date === currentLoopDate && t.status !== 'done').forEach(t => dayColors.push(t.color || 'var(--color-tugas)'));
-        
-        let uColors = [...new Set(dayColors)]; let pillStyle = '';
-        if (uColors.length === 1) pillStyle = `background: ${uColors[0]};`;
-        else if (uColors.length > 1) {
-            let gradient = 'linear-gradient(to right, '; let step = 100 / uColors.length;
-            uColors.forEach((c, idx) => { gradient += `${c} ${idx * step}%, ${c} ${(idx + 1) * step}%${idx < uColors.length - 1 ? ', ' : ''}`; });
-            pillStyle = `background: ${gradient});`;
-        }
-        let pillHtml = uColors.length > 0 ? `<div class="event-pill-container"><div class="event-pill" style="${pillStyle}"></div></div>` : '';
-        let numClass = isOffDay ? 'day-number sunday-red' : 'day-number';
-        grid.innerHTML += `<div class="day-cell" onclick="showDayDetails('${currentLoopDate}', '${loopDayName}')"><span class="${numClass}">${i}</span>${pillHtml}</div>`;
-    }
-    const totalCells = firstDay + daysInMonth; const nextDays = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
-    for(let i = 1; i <= nextDays; i++) { grid.innerHTML += `<div class="day-cell dimmed" onclick="changeMonth(1)"><span class="day-number">${i}</span></div>`; }
-}
-
 function showDayDetails(dateStr, dayName) {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; 
     let overrides = JSON.parse(localStorage.getItem('nalaOverrides')) || [];
@@ -431,7 +396,6 @@ function showDayDetails(dateStr, dayName) {
     
     let popUpItems = [];
 
-    // 1. Ambil Jadwal Kuliah Reguler & Override
     let matkulsToday = savedMatkul.filter(m => m.hari === dayName); 
     if(isOffDay) matkulsToday = []; 
     matkulsToday = matkulsToday.filter(m => !overrides.some(o => o.matkulId === m.id && o.originalDate === dateStr));
@@ -446,16 +410,13 @@ function showDayDetails(dateStr, dayName) {
         popUpItems.push({ type: 'kuliah', id: m.id, name: m.name, badge: 'Kuliah', time: time, endTime: end, color: 'var(--color-kuliah)', ruang: ruang, dosen: dosen, origDate: origDate });
     });
 
-    // 2. Ambil Tugas & Acara
     savedTasks.filter(t => t.date === dateStr).forEach(t => {
         let tCat = t.category.toLowerCase().includes('tugas') ? 'Tugas' : 'Acara';
         popUpItems.push({ type: 'tugasAcara', id: t.id, name: t.name, badge: tCat, time: t.time, endTime: '', color: t.color || 'var(--color-tugas)', desc: t.deskripsi, via: t.pengumpulan });
     });
 
-    // Urutkan berdasarkan jam
     popUpItems.sort((a, b) => a.time.localeCompare(b.time));
 
-    // Render ke HTML
     let listHtml = '';
     popUpItems.forEach(item => {
         let detailHtml = '';
@@ -621,6 +582,7 @@ function saveNewTask() {
     closeModal('insert-modal'); refreshAllViews();
 }
 
+// --- MATKUL PENGATURAN ---
 if(document.getElementById('matkul-list')) renderMatkulList();
 function openMatkulModal() { editId = null; document.getElementById('matkul-form').reset(); document.getElementById('matkul-modal').style.display = 'flex'; }
 
@@ -663,10 +625,12 @@ function renderMatkulList() {
             </div>`; 
     });
 }
+
 function editMatkul(id) {
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; let m = savedMatkul.find(x => x.id == id);
     if(m) { editId = m.id; document.getElementById('m-name').value = m.name; document.getElementById('m-hari').value = m.hari; document.getElementById('m-jamMulai').value = m.jamMulai; document.getElementById('m-jamSelesai').value = m.jamSelesai; document.getElementById('m-dosen').value = m.dosen; document.getElementById('m-ruangan').value = m.ruangan; document.getElementById('matkul-modal').style.display = 'flex'; }
 }
+
 function deleteMatkul(id) {
     if(!confirm('Hapus jadwal kuliah ini?')) return;
     let savedMatkul = JSON.parse(localStorage.getItem('nalaMatkul')) || []; savedMatkul = savedMatkul.filter(m => m.id != id);
@@ -684,19 +648,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- LOGIKA ANIMASI INTRO ---
     const introScreen = document.getElementById('intro-screen');
     if (introScreen) {
-        // Cek apakah intro sudah dimainkan di sesi ini
         if (!sessionStorage.getItem('introPlayed')) {
             const introVid = document.getElementById('intro-video');
+            let isHidden = false; // Flag anti-stuck
             
             const hideIntro = () => { 
+                if (isHidden) return; // Jangan jalankan 2 kali
+                isHidden = true;
                 introScreen.classList.add('intro-hidden'); 
                 sessionStorage.setItem('introPlayed', 'true'); 
                 setTimeout(() => { introScreen.style.display = 'none'; }, 500);
             };
             
-            // Hilang otomatis setelah video habis ATAU maksimal 2.5 detik (sebagai cadangan)
-            if(introVid) introVid.onended = hideIntro;
+            if (introVid) {
+                introVid.onended = hideIntro;
+                introVid.onerror = hideIntro;
+            }
+            
+            // SISTEM KEAMANAN (ANTI-STUCK): Apapun yang terjadi pada video, intro WAJIB hilang setelah 2.5 detik
             setTimeout(hideIntro, 2500); 
+            
         } else {
             // Jika sudah pernah diputar, sembunyikan secara instan
             introScreen.style.display = 'none';
