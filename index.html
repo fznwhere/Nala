@@ -4,22 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pola - Beranda</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Panggilan Ikon PWA -->
     <link rel="icon" type="image/png" href="img/logo.png">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ANIMASI INTRO -->
+    <!-- ANIMASI INTRO (Akan disembunyikan JS jika error) -->
     <div id="intro-screen">
         <video id="intro-video" src="img/intro.mp4" autoplay muted playsinline></video>
     </div>
 
     <div class="app-container">
-        <!-- (Kode app-container milikmu selanjutnya...) -->
-        <header>
-            <h1 class="brand-title">Pola<span class="brand-dot">.</span></h1>
-            <p>Hari Ini</p>
-        </header>
+        <header><h1 class="brand-title">Pola<span class="brand-dot">.</span></h1><p>Hari Ini</p></header>
         
         <div id="schedule-list"></div>
 
