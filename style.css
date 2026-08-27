@@ -143,3 +143,12 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
     width: 100%; max-width: 480px; height: 100%; object-fit: cover;
 }
 .intro-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+/* PENANDA HARI INI (TODAY HIGHLIGHT) */
+.day-cell.today-highlight {
+    background-color: var(--text-main); /* Menggunakan warna coklat gelap utama */
+    box-shadow: 0 4px 10px rgba(45, 42, 38, 0.2);
+    border-color: var(--text-main);
+}
+.day-cell.today-highlight .day-number {
+    color: #FFFFFF !important; /* Angka menjadi putih agar kontras */
+}
