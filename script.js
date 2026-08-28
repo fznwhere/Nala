@@ -175,7 +175,6 @@ if(document.getElementById('calendar-grid')) {
     }
 }
 
-// --- SEMUA FUNGSI GLOBAL DI BAWAH INI ---
 function renderMonthCalendar() {
     const grid = document.getElementById('calendar-grid'); if(!grid) return; grid.innerHTML = '';
     const year = currentNavDate.getFullYear(); const month = currentNavDate.getMonth();
@@ -220,6 +219,7 @@ function renderMonthCalendar() {
         let numClass = isOffDay ? 'day-number sunday-red' : 'day-number';
         
         let todayClass = (currentLoopDate === realTodayStr) ? ' today-highlight' : '';
+        
         grid.innerHTML += `<div class="day-cell${todayClass}" onclick="showDayDetails('${currentLoopDate}', '${loopDayName}')"><span class="${numClass}">${i}</span>${pillHtml}</div>`;
     }
     const totalCells = firstDay + daysInMonth; const nextDays = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
