@@ -81,10 +81,11 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
 
 /* PENANDA HARI INI (TODAY HIGHLIGHT) */
 .day-cell.today-highlight {
-    background-color: var(--text-main); 
-    box-shadow: 0 4px 10px rgba(45, 42, 38, 0.2);
-    border-color: var(--text-main);
+    background-color: rgba(45, 42, 38, 0.06); /* Warna transparan yang sangat lembut */
+    border: 2px solid var(--text-main); /* Bingkai lebih tegas agar tetap menonjol */
+    box-shadow: 0 4px 10px rgba(45, 42, 38, 0.05);
 }
+/* Baris kode yang memaksa angka menjadi warna putih (#FFFFFF) SUDAH DIHAPUS */
 .day-cell.today-highlight .day-number { color: #FFFFFF !important; }
 
 .card { background-color: var(--bg-card); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05); border: 1px solid var(--border-line); }
