@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pola - Kalender</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="img/logo.png">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- ANIMASI INTRO -->
+    <div id="intro-screen">
+        <video id="intro-video" src="img/intro.mp4" autoplay muted playsinline></video>
+    </div>
+
     <div class="app-container">
         
         <div class="calendar-header">
@@ -57,32 +62,6 @@
         </div>
     </div>
 
-    <!-- MODAL MATKUL -->
-    <div class="modal-overlay" id="matkul-modal">
-        <div class="modal">
-            <h2>Data Kuliah</h2>
-            <form id="matkul-form">
-                <label>Nama Kuliah *</label><input type="text" id="m-name">
-                <label>Hari *</label>
-                <select id="m-hari">
-                    <option value="Senin">Senin</option><option value="Selasa">Selasa</option>
-                    <option value="Rabu">Rabu</option><option value="Kamis">Kamis</option>
-                    <option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option>
-                </select>
-                <div style="display: flex; gap: 10px;">
-                    <div style="width: 50%;"><label>Jam Mulai *</label><input type="time" id="m-jamMulai"></div>
-                    <div style="width: 50%;"><label>Jam Selesai</label><input type="time" id="m-jamSelesai"></div>
-                </div>
-                <label>Dosen Pengampu</label><input type="text" id="m-dosen">
-                <label>Ruangan</label><input type="text" id="m-ruangan">
-            </form>
-            <div class="modal-btns">
-                <button onclick="closeModal('matkul-modal')" class="btn-cancel">Batal</button>
-                <button class="btn-save" onclick="saveMatkul()">Simpan</button>
-            </div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="reschedule-modal">
         <div class="modal">
             <h2 style="font-size: 16px;">Ubah Jadwal Ini</h2>
@@ -91,6 +70,7 @@
             <input type="hidden" id="res-originalDate">
             <label>Pindah ke Tanggal</label><input type="date" id="res-date">
             <label>Ubah Jam</label><input type="time" id="res-time">
+            <label>Ubah Jam Selesai</label><input type="time" id="res-time-end">
             <label>Ubah Ruangan / Via</label><input type="text" id="res-ruang">
             <label>Dosen Pengganti</label><input type="text" id="res-dosen">
             <div class="modal-btns">
