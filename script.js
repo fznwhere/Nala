@@ -79,7 +79,7 @@ function refreshAllViews() {
     if(document.getElementById('matkul-list')) renderMatkulList();
 }
 
-// --- BERANDA PENGATURAN ---
+// --- BERANDA ---
 if(document.getElementById('schedule-list')) loadTodaySchedule();
 
 async function loadTodaySchedule() {
@@ -175,7 +175,7 @@ if(document.getElementById('calendar-grid')) {
     }
 }
 
-// SEMUA FUNGSI GLOBAL DI BAWAH INI
+// --- SEMUA FUNGSI GLOBAL DI BAWAH INI ---
 function renderMonthCalendar() {
     const grid = document.getElementById('calendar-grid'); if(!grid) return; grid.innerHTML = '';
     const year = currentNavDate.getFullYear(); const month = currentNavDate.getMonth();
@@ -645,7 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }); 
     });
 
-    // --- LOGIKA ANIMASI INTRO ---
+    // --- LOGIKA ANIMASI INTRO ANTI-STUCK ---
     const introScreen = document.getElementById('intro-screen');
     if (introScreen) {
         if (!sessionStorage.getItem('introPlayed')) {
@@ -662,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (introVid) {
                 introVid.onended = hideIntro;
-                introVid.onerror = hideIntro;
+                introVid.onerror = hideIntro; // Sembunyikan kalau video error/tidak ketemu
             }
             
             // SISTEM KEAMANAN (ANTI-STUCK): Apapun yang terjadi pada video, intro WAJIB hilang setelah 2.5 detik
