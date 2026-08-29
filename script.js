@@ -163,7 +163,7 @@ async function loadTodaySchedule() {
     });
 }
 
-// --- KALENDER PENGATURAN ---
+// --- KALENDER ---
 if(document.getElementById('calendar-grid')) {
     renderMonthCalendar(); renderHistory('Tugas Kuliah'); renderUpcomingTasks();
     let tabsContainer = document.querySelector('.history-tabs');
@@ -582,7 +582,7 @@ function saveNewTask() {
     closeModal('insert-modal'); refreshAllViews();
 }
 
-// --- MATKUL PENGATURAN ---
+// --- MATKUL ---
 if(document.getElementById('matkul-list')) renderMatkulList();
 function openMatkulModal() { editId = null; document.getElementById('matkul-form').reset(); document.getElementById('matkul-modal').style.display = 'flex'; }
 
@@ -645,7 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }); 
     });
 
- // --- LOGIKA ANIMASI INTRO ANTI-STUCK ---
+    // --- LOGIKA ANIMASI INTRO ANTI-STUCK ---
     const introScreen = document.getElementById('intro-screen');
     if (introScreen) {
         if (!sessionStorage.getItem('introPlayed')) {
@@ -657,10 +657,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 isHidden = true;
                 introScreen.classList.add('intro-hidden'); 
                 sessionStorage.setItem('introPlayed', 'true'); 
-                
-                // BUKA KUNCI: Munculkan isi web sesaat sebelum intro memudar
-                document.body.classList.remove('is-loading-intro');
-                
                 setTimeout(() => { introScreen.style.display = 'none'; }, 500);
             };
             
@@ -673,8 +669,8 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(hideIntro, 2500); 
             
         } else {
-            // Jika sudah pernah diputar, sembunyikan intro & munculkan web secara instan
+            // Jika sudah pernah diputar, sembunyikan secara instan
             introScreen.style.display = 'none';
-            document.body.classList.remove('is-loading-intro');
         }
     }
+});
