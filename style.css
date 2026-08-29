@@ -76,13 +76,13 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
 .day-cell.dimmed { opacity: 0.4; background-color: transparent; border-style: dashed; }
 .day-number { font-size: 14px; font-weight: 700; color: var(--text-main); }
 
-/* --- PERBAIKAN WARNA TANGGAL MERAH --- */
+/* WARNA TANGGAL MERAH TETAP MENANG */
 .day-number.sunday-red { color: var(--color-minggu) !important; }
 
 .event-pill-container { width: 100%; height: 6px; padding: 0 4px; margin-top: auto; margin-bottom: 2px; }
 .event-pill { width: 100%; height: 100%; border-radius: 4px; }
 
-/* --- PENANDA HARI INI (TODAY HIGHLIGHT) --- */
+/* PENANDA HARI INI (Blok Transparan Lembut) */
 .day-cell.today-highlight {
     background-color: rgba(45, 42, 38, 0.06); 
     border: 2px solid var(--text-main); 
@@ -151,9 +151,3 @@ header p { color: var(--text-muted); font-size: 14px; font-weight: 500; margin-t
 }
 #intro-screen video { width: 100%; max-width: 480px; height: 100%; object-fit: cover; }
 .intro-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-/* Menyembunyikan isi web sebelum intro selesai */
-body.is-loading-intro .app-container,
-body.is-loading-intro .bottom-nav {
-    display: none !important;
-}
