@@ -645,7 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }); 
     });
 
-    // --- LOGIKA ANIMASI INTRO ANTI-STUCK ---
+ // --- LOGIKA ANIMASI INTRO ANTI-STUCK ---
     const introScreen = document.getElementById('intro-screen');
     if (introScreen) {
         if (!sessionStorage.getItem('introPlayed')) {
@@ -657,6 +657,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 isHidden = true;
                 introScreen.classList.add('intro-hidden'); 
                 sessionStorage.setItem('introPlayed', 'true'); 
+                
+                // BUKA KUNCI: Munculkan isi web sesaat sebelum intro memudar
+                document.body.classList.remove('is-loading-intro');
+                
                 setTimeout(() => { introScreen.style.display = 'none'; }, 500);
             };
             
@@ -669,8 +673,8 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(hideIntro, 2500); 
             
         } else {
-            // Jika sudah pernah diputar, sembunyikan secara instan
+            // Jika sudah pernah diputar, sembunyikan intro & munculkan web secara instan
             introScreen.style.display = 'none';
+            document.body.classList.remove('is-loading-intro');
         }
     }
-});
