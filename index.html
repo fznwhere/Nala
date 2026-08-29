@@ -8,12 +8,13 @@
     <link rel="icon" type="image/png" href="img/logo.png">
     <link rel="manifest" href="manifest.json">
 </head>
-<body>
-    <!-- ANIMASI INTRO -->
+   <body class="is-loading-intro">
+    <!-- ANIMASI INTRO (preload="auto" agar dimuat duluan tanpa jeda) -->
     <div id="intro-screen">
-        <video id="intro-video" src="img/intro.mp4" autoplay muted playsinline></video>
+        <video id="intro-video" src="img/intro.mp4" autoplay muted playsinline preload="auto"></video>
     </div>
 
+    <!-- (Kode app-container dan seterusnya tetap biarkan seperti aslinya...) -->
     <div class="app-container">
         <header><h1 class="brand-title">Pola<span class="brand-dot">.</span></h1><p>Hari Ini</p></header>
         
